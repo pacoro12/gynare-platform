@@ -536,9 +536,22 @@ a { text-decoration: none; color: inherit; }
   .booking__form-side { padding-left: 0; }
 }
 @media (max-width: 900px) {
-  .nav__links { display: none; flex-direction: column; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--plum-dark); justify-content: center; align-items: center; gap: 28px; z-index: 100; }
+  /* Eliminar backdrop-filter en móvil: crea un stacking context que rompe el overlay */
+  .nav.scrolled { backdrop-filter: none; }
+  .nav__links {
+    display: none;
+    flex-direction: column;
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background-color: var(--plum-dark) !important;
+    justify-content: center; align-items: center; gap: 32px;
+    z-index: 9999;
+    overflow-y: auto;
+  }
   .nav__links.open { display: flex; }
-  .nav__burger { display: flex; z-index: 101; }
+  .nav__links a { font-size: 18px !important; color: rgba(255,255,255,0.9) !important; }
+  .nav__links .nav__cta { font-size: 16px !important; }
+  .nav__links .nav__medical { font-size: 14px !important; padding: 8px 20px; }
+  .nav__burger { display: flex; z-index: 10000; position: relative; }
 }
 @media (max-width: 640px) {
   html { font-size: 16px; }
