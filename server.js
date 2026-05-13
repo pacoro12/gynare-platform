@@ -23,6 +23,7 @@ app.use('/api/prenatal', require('./routes/prenatal'));
 app.use('/api/cobros', require('./routes/cobros'));
 app.use('/api/recordatorios', require('./routes/recordatorios'));
 app.use('/api/reportes', require('./routes/reportes'));
+app.use('/api/seed-demo', require('./routes/seed'));
 
 // SPA fallback para la plataforma
 app.get('/platform*', (req, res) => {
