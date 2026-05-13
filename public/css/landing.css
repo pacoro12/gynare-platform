@@ -256,9 +256,10 @@ a { text-decoration: none; color: inherit; }
 .service-card:hover::before { opacity: 1; }
 .service-card--accent { background: var(--rose-pale); border-color: var(--rose-light); }
 .service-card--doppler { background: var(--plum); color: var(--white); border-color: var(--plum-mid); }
-.service-card--doppler h3 { color: var(--white); }
-.service-card--doppler p { color: rgba(255,255,255,0.75); }
+.service-card--doppler h3 { color: var(--white) !important; }
+.service-card--doppler p { color: rgba(255,255,255,0.78) !important; }
 .service-card--doppler .service-card__icon { background: rgba(255,255,255,0.12); color: var(--rose); }
+.service-card--doppler::before { background: linear-gradient(90deg, var(--rose), var(--white)); }
 .service-card__icon {
   width: 52px; height: 52px; background: var(--rose-pale); border-radius: 13px;
   display: flex; align-items: center; justify-content: center; color: var(--plum); margin-bottom: 18px;
