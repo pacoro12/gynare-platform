@@ -43,8 +43,10 @@ router.get('/stats', (req, res) => {
   const citasHoy = db.prepare(`SELECT COUNT(*) as c FROM citas WHERE fecha = date('now') AND estado != 'cancelada'`).get().c;
   const citasSemana = db.prepare(`SELECT COUNT(*) as c FROM citas WHERE fecha BETWEEN date('now') AND date('now','+7 days') AND estado != 'cancelada'`).get().c;
   const solicitudesWeb = db.prepare(`SELECT COUNT(*) as c FROM citas WHERE origen = 'web' AND estado = 'pendiente'`).get().c;
+  const embarazosActivos = db.prepare(`SELECT COUNT(*) as c FROM embarazos WHERE estado = 'activo'`).get().c;
+  const recordatoriosVencidos = db.prepare(`SELECT COUNT(*) as c FROM recordatorios WHERE estado = 'pendiente' AND fecha_programada < date('now')`).get().c;
 
-  res.json({ total, mes, citasHoy, citasSemana, solicitudesWeb });
+  res.json({ total, mes, citasHoy, citasSemana, solicitudesWeb, embarazosActivos, recordatoriosVencidos });
 });
 
 // GET /api/pacientes/:id

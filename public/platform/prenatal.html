@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GYNARE · Control Prenatal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/platform.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title">Control Prenatal</span>
+      <div class="topbar__actions">
+        <button class="btn btn--primary btn--sm" onclick="abrirNuevoEmbarazo()">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5v10M1.5 6.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Nuevo Embarazo
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- Stats -->
+      <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 24px">
+        <div class="stat-card stat-card--accent">
+          <div class="stat-card__label">Embarazos activos</div>
+          <div class="stat-card__value" id="statActivos">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Primer trimestre</div>
+          <div class="stat-card__value" id="stat1T">—</div>
+          <div class="stat-card__sub">&lt; 13 semanas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Segundo trimestre</div>
+          <div class="stat-card__value" id="stat2T">—</div>
+          <div class="stat-card__sub">13–27 semanas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Tercer trimestre</div>
+          <div class="stat-card__value" id="stat3T">—</div>
+          <div class="stat-card__sub">≥ 28 semanas</div>
+        </div>
+      </div>
+
+      <!-- Lista de embarazos activos -->
+      <div class="table-wrap">
+        <div class="table-head">
+          <span class="table-head__title">🤰 Embarazos activos</span>
+        </div>
+        <div id="embarazosList" style="padding: 12px">
+          <div class="empty-state"><p>Cargando...</p></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nuevo Embarazo -->
+<div class="modal-overlay hidden" id="modalEmbarazo">
+  <div class="modal">
+    <div class="modal__header">
+      <span class="modal__title">Registrar nuevo embarazo</span>
+      <button class="modal__close" onclick="cerrarModal()">✕</button>
+    </div>
+    <div class="modal__body">
+      <div style="margin-bottom: 16px; background: #f3e5f5; border-radius: 10px; padding: 14px 18px; font-size: 13px; color: #6a1b9a">
+        La FPP se calcula automáticamente con la Regla de Naegele (FUM + 280 días).
+      </div>
+      <div class="form-grid form-grid--2">
+        <div class="form-group form-group--full">
+          <label>Paciente *</label>
+          <input type="text" id="buscarPaciente" placeholder="Buscar por nombre..." oninput="buscarPacientes(this.value)" autocomplete="off">
+          <div id="pacienteSugerencias" style="position:relative"></div>
+          <input type="hidden" id="pacienteId">
+          <div id="pacienteSeleccionado" style="display:none; margin-top:8px; padding:8px 12px; background:#e8f5e9; border-radius:8px; font-size:13px; color:#2e7d32"></div>
+        </div>
+        <div class="form-group">
+          <label>FUM (Fecha Última Menstruación) *</label>
+          <input type="date" id="fumInput" oninput="calcularFPP()">
+        </div>
+        <div class="form-group">
+          <label>FPP estimada (Naegele)</label>
+          <input type="date" id="fppInput" readonly style="background:var(--gray-50); color:var(--gray-700)">
+        </div>
+        <div class="form-group">
+          <label>Tipo de embarazo</label>
+          <select id="tipoEmbarazo">
+            <option value="único">Único</option>
+            <option value="gemelar">Gemelar</option>
+            <option value="triple">Triple</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Semanas al ingresar</label>
+          <input type="number" id="semanasInput" min="1" max="42" placeholder="Calculado automáticamente">
+        </div>
+        <div class="form-group form-group--full">
+          <label>Notas iniciales</label>
+          <textarea id="notasEmbarazo" rows="2"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--outline" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn--primary" onclick="guardarEmbarazo()">Registrar embarazo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nuevo control prenatal -->
+<div class="modal-overlay hidden" id="modalControl">
+  <div class="modal" style="max-width: 720px">
+    <div class="modal__header">
+      <span class="modal__title" id="modalControlTitle">Nuevo control prenatal</span>
+      <button class="modal__close" onclick="cerrarModalControl()">✕</button>
+    </div>
+    <div class="modal__body">
+      <input type="hidden" id="controlEmbarazoId">
+      <div class="form-grid form-grid--3">
+        <div class="form-group">
+          <label>Fecha *</label>
+          <input type="date" id="cFecha" value="">
+        </div>
+        <div class="form-group">
+          <label>Semanas de gestación</label>
+          <input type="number" id="cSemanas" min="1" max="42">
+        </div>
+        <div class="form-group">
+          <label>Peso (kg)</label>
+          <input type="number" id="cPeso" step="0.1" min="30" max="200">
+        </div>
+        <div class="form-group">
+          <label>Tensión arterial</label>
+          <input type="text" id="cTA" placeholder="120/80">
+        </div>
+        <div class="form-group">
+          <label>FC Materna (lpm)</label>
+          <input type="number" id="cFCM" min="40" max="200">
+        </div>
+        <div class="form-group">
+          <label>FC Fetal (lpm)</label>
+          <input type="number" id="cFCF" min="80" max="200">
+        </div>
+        <div class="form-group">
+          <label>Altura uterina (cm)</label>
+          <input type="number" id="cAU" step="0.5" min="5" max="45">
+        </div>
+        <div class="form-group">
+          <label>Presentación fetal</label>
+          <select id="cPresentacion">
+            <option value="">—</option>
+            <option value="cefálica">Cefálica</option>
+            <option value="pélvica">Pélvica</option>
+            <option value="transversa">Transversa</option>
+            <option value="oblicua">Oblicua</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Movimientos fetales</label>
+          <select id="cMovimientos">
+            <option value="">—</option>
+            <option value="presentes">Presentes</option>
+            <option value="reducidos">Reducidos</option>
+            <option value="ausentes">Ausentes</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Edema</label>
+          <select id="cEdema">
+            <option value="">—</option>
+            <option value="negativo">Negativo</option>
+            <option value="+">+</option>
+            <option value="++">++</option>
+            <option value="+++">+++</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Hemoglobina (g/dL)</label>
+          <input type="number" id="cHb" step="0.1" min="5" max="20">
+        </div>
+        <div class="form-group">
+          <label>Glucemia (mg/dL)</label>
+          <input type="number" id="cGlucemia" min="40" max="600">
+        </div>
+        <div class="form-group form-group--full">
+          <label>Ultrasonido — hallazgos</label>
+          <textarea id="cUltrasonido" rows="2"></textarea>
+        </div>
+        <div class="form-group form-group--full">
+          <label>Laboratorios</label>
+          <textarea id="cLabs" rows="2"></textarea>
+        </div>
+        <div class="form-group form-group--full">
+          <label>Diagnóstico / Impresión clínica</label>
+          <textarea id="cDiagnostico" rows="2"></textarea>
+        </div>
+        <div class="form-group form-group--full">
+          <label>Plan / Indicaciones</label>
+          <textarea id="cPlan" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Próxima cita</label>
+          <input type="date" id="cProximaCita">
+        </div>
+        <div class="form-group form-group--full">
+          <label>Notas</label>
+          <textarea id="cNotas" rows="2"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--outline" onclick="cerrarModalControl()">Cancelar</button>
+      <button class="btn btn--primary" onclick="guardarControl()">Guardar control</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/platform-api.js"></script>
+<script>
+checkAuth();
+renderSidebar('prenatal');
+loadAllBadges();
+
+const hoy = new Date().toISOString().split('T')[0];
+
+async function cargarEmbarazos() {
+  try {
+    const embarazos = await API.get('/prenatal/activos');
+
+    // Stats por trimestre
+    let t1 = 0, t2 = 0, t3 = 0;
+    embarazos.forEach(e => {
+      const s = e.semanas_actuales || calcSemanasGestacion(e.fum) || 0;
+      if (s < 13) t1++;
+      else if (s < 28) t2++;
+      else t3++;
+    });
+    document.getElementById('statActivos').textContent = embarazos.length;
+    document.getElementById('stat1T').textContent = t1;
+    document.getElementById('stat2T').textContent = t2;
+    document.getElementById('stat3T').textContent = t3;
+
+    const lista = document.getElementById('embarazosList');
+    if (!embarazos.length) {
+      lista.innerHTML = `<div class="empty-state">
+        <p>No hay embarazos activos registrados</p>
+        <button class="btn btn--primary" style="margin-top:12px" onclick="abrirNuevoEmbarazo()">Registrar primer embarazo</button>
+      </div>`;
+      return;
+    }
+
+    lista.innerHTML = embarazos.map(e => {
+      const semanas = e.semanas_actuales || calcSemanasGestacion(e.fum) || '?';
+      const fppStr = e.fpp ? formatDate(e.fpp) : '—';
+      const diasRestantes = e.fpp ? Math.ceil((new Date(e.fpp+'T12:00:00') - new Date()) / 86400000) : null;
+      const trimestre = semanas < 13 ? '1er trimestre' : semanas < 28 ? '2do trimestre' : '3er trimestre';
+      return `
+        <div class="embarazo-card">
+          <div class="embarazo-card__weeks">
+            <div class="embarazo-card__weeks-num">${semanas}</div>
+            <div class="embarazo-card__weeks-label">semanas</div>
+          </div>
+          <div class="embarazo-card__info">
+            <div class="embarazo-card__name">${e.nombre} ${e.apellido_paterno}</div>
+            <div class="embarazo-card__meta">
+              ${trimestre} · ${e.tipo_embarazo || 'único'}<br>
+              FUM: ${formatDate(e.fum)} · FPP: ${fppStr}
+              ${diasRestantes !== null ? ` · <strong style="color:${diasRestantes < 14 ? '#c62828' : 'var(--text)'}">
+                ${diasRestantes > 0 ? `${diasRestantes} días para FPP` : 'FPP alcanzada'}
+              </strong>` : ''}
+              <br>
+              ${e.num_controles || 0} control${e.num_controles !== 1 ? 'es' : ''} registrado${e.num_controles !== 1 ? 's' : ''}
+              · 📞 ${e.telefono || '—'}
+            </div>
+          </div>
+          <div class="embarazo-card__actions">
+            <button class="btn btn--primary btn--sm" onclick="abrirControl(${e.id}, '${e.nombre} ${e.apellido_paterno}')">+ Control</button>
+            <a href="/platform/paciente.html?id=${e.paciente_id}" class="btn btn--outline btn--sm">Expediente</a>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+
+function abrirNuevoEmbarazo() {
+  document.getElementById('modalEmbarazo').classList.remove('hidden');
+  document.getElementById('cFecha') && (document.getElementById('cFecha').value = hoy);
+}
+function cerrarModal() {
+  document.getElementById('modalEmbarazo').classList.add('hidden');
+  document.getElementById('buscarPaciente').value = '';
+  document.getElementById('pacienteId').value = '';
+  document.getElementById('pacienteSeleccionado').style.display = 'none';
+  document.getElementById('fumInput').value = '';
+  document.getElementById('fppInput').value = '';
+  document.getElementById('semanasInput').value = '';
+  document.getElementById('notasEmbarazo').value = '';
+}
+
+function calcularFPP() {
+  const fum = document.getElementById('fumInput').value;
+  if (!fum) return;
+  const d = new Date(fum + 'T12:00:00');
+  d.setDate(d.getDate() + 280);
+  document.getElementById('fppInput').value = d.toISOString().split('T')[0];
+  const semanas = calcSemanasGestacion(fum);
+  if (semanas) document.getElementById('semanasInput').value = semanas;
+}
+
+let busquedaTimer;
+async function buscarPacientes(q) {
+  clearTimeout(busquedaTimer);
+  if (q.length < 2) { document.getElementById('pacienteSugerencias').innerHTML = ''; return; }
+  busquedaTimer = setTimeout(async () => {
+    try {
+      const data = await API.get(`/pacientes?q=${encodeURIComponent(q)}&limit=5`);
+      const div = document.getElementById('pacienteSugerencias');
+      if (!data.pacientes.length) { div.innerHTML = '<div style="font-size:12px;color:var(--gray-400);padding:6px 0">Sin resultados</div>'; return; }
+      div.innerHTML = `<div style="position:absolute; top:0; left:0; right:0; background:white; border:1.5px solid var(--gray-200); border-radius:8px; box-shadow:var(--shadow-md); z-index:100; max-height:200px; overflow-y:auto">
+        ${data.pacientes.map(p => `
+          <div onclick="seleccionarPaciente(${p.id}, '${p.nombre} ${p.apellido_paterno} ${p.apellido_materno||''}')"
+            style="padding:10px 14px; cursor:pointer; font-size:13px; border-bottom:1px solid var(--gray-100); display:flex; gap:8px; align-items:center"
+            onmouseenter="this.style.background='var(--gray-50)'" onmouseleave="this.style.background=''">
+            <div class="patient-avatar" style="width:28px;height:28px;font-size:11px;flex-shrink:0">${p.nombre[0]}</div>
+            <div>${p.nombre} ${p.apellido_paterno} · ${p.telefono||'sin tel'}</div>
+          </div>
+        `).join('')}
+      </div>`;
+    } catch {}
+  }, 300);
+}
+
+function seleccionarPaciente(id, nombre) {
+  document.getElementById('pacienteId').value = id;
+  document.getElementById('buscarPaciente').value = nombre;
+  document.getElementById('pacienteSugerencias').innerHTML = '';
+  const sel = document.getElementById('pacienteSeleccionado');
+  sel.textContent = '✓ ' + nombre.trim();
+  sel.style.display = 'block';
+}
+
+async function guardarEmbarazo() {
+  const pid = document.getElementById('pacienteId').value;
+  const fum = document.getElementById('fumInput').value;
+  if (!pid) { toast('Selecciona una paciente', 'err'); return; }
+  if (!fum) { toast('La FUM es requerida', 'err'); return; }
+
+  try {
+    await API.post('/prenatal', {
+      paciente_id: pid,
+      fum,
+      tipo_embarazo: document.getElementById('tipoEmbarazo').value,
+      semanas_al_ingresar: document.getElementById('semanasInput').value || null,
+      notas: document.getElementById('notasEmbarazo').value
+    });
+    toast('Embarazo registrado', 'ok');
+    cerrarModal();
+    cargarEmbarazos();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+let embarazoActualId = null;
+function abrirControl(embarazoId, nombre) {
+  embarazoActualId = embarazoId;
+  document.getElementById('controlEmbarazoId').value = embarazoId;
+  document.getElementById('modalControlTitle').textContent = `Control prenatal — ${nombre}`;
+  document.getElementById('cFecha').value = hoy;
+  document.getElementById('modalControl').classList.remove('hidden');
+}
+function cerrarModalControl() {
+  document.getElementById('modalControl').classList.add('hidden');
+  embarazoActualId = null;
+}
+
+async function guardarControl() {
+  const embarazoId = embarazoActualId;
+  const fecha = document.getElementById('cFecha').value;
+  if (!fecha) { toast('La fecha es requerida', 'err'); return; }
+  try {
+    await API.post(`/prenatal/${embarazoId}/controles`, {
+      fecha, semanas: document.getElementById('cSemanas').value||null,
+      peso: document.getElementById('cPeso').value||null,
+      tension_arterial: document.getElementById('cTA').value||null,
+      fcm: document.getElementById('cFCM').value||null,
+      fcf: document.getElementById('cFCF').value||null,
+      altura_uterina: document.getElementById('cAU').value||null,
+      presentacion: document.getElementById('cPresentacion').value||null,
+      movimientos_fetales: document.getElementById('cMovimientos').value||null,
+      edema: document.getElementById('cEdema').value||null,
+      hemoglobina: document.getElementById('cHb').value||null,
+      glucemia: document.getElementById('cGlucemia').value||null,
+      ultrasonido: document.getElementById('cUltrasonido').value||null,
+      laboratorios: document.getElementById('cLabs').value||null,
+      diagnostico: document.getElementById('cDiagnostico').value||null,
+      plan: document.getElementById('cPlan').value||null,
+      proxima_cita: document.getElementById('cProximaCita').value||null,
+      notas: document.getElementById('cNotas').value||null
+    });
+    toast('Control prenatal guardado', 'ok');
+    cerrarModalControl();
+    cargarEmbarazos();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.add('hidden'); });
+});
+
+cargarEmbarazos();
+</script>
+</body>
+</html>

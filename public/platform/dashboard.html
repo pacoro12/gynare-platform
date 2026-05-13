@@ -9,50 +9,8 @@
 </head>
 <body>
 <div class="app">
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar__brand">
-      <div class="sidebar__brand-name">GYNARE</div>
-      <div class="sidebar__brand-sub">Clínica de la Mujer</div>
-    </div>
-    <nav class="sidebar__nav">
-      <div class="sidebar__section">Principal</div>
-      <a href="/platform/dashboard.html" class="sidebar__link active">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>
-        Dashboard
-      </a>
-      <a href="/platform/citas.html" class="sidebar__link">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 1.5v3M11 1.5v3M1.5 7h13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-        Agenda
-      </a>
-      <a href="/platform/solicitudes.html" class="sidebar__link">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3.5l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Solicitudes Web
-        <span class="sidebar__badge" id="webBadge" style="display:none">0</span>
-      </a>
-      <div class="sidebar__section">Pacientes</div>
-      <a href="/platform/pacientes.html" class="sidebar__link">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-        Pacientes
-      </a>
-      <a href="/platform/nueva-paciente.html" class="sidebar__link">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M1 14c0-3.31 2.69-6 6-6M11 10v4M9 12h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-        Nueva Paciente
-      </a>
-    </nav>
-    <div class="sidebar__user">
-      <div class="sidebar__user-avatar" id="sidebarAvatar">D</div>
-      <div>
-        <div class="sidebar__user-name" id="sidebarUserName">Cargando...</div>
-        <div class="sidebar__user-role" id="sidebarUserRole">Médico</div>
-      </div>
-      <button class="sidebar__logout" onclick="logout()" title="Cerrar sesión">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-    </div>
-  </aside>
+  <aside class="sidebar" id="sidebar"></aside>
 
-  <!-- MAIN -->
   <div class="main">
     <header class="topbar">
       <span class="topbar__title">Dashboard</span>
@@ -67,7 +25,14 @@
 
     <div class="content">
 
-      <!-- Stats -->
+      <!-- Alerta recordatorios vencidos -->
+      <div id="alertaRecordatorios" style="display:none; background:#fff3cd; border:1px solid #ffc107; border-radius:10px; padding:12px 18px; margin-bottom:18px; display:flex; align-items:center; gap:12px; font-size:14px">
+        <span style="font-size:18px">⚠️</span>
+        <span id="alertaRecordatoriosTexto">Tienes recordatorios vencidos</span>
+        <a href="/platform/recordatorios.html" class="btn btn--sm" style="margin-left:auto; background:#ffc107; color:#333; border:none">Ver ahora</a>
+      </div>
+
+      <!-- Stats principales -->
       <div class="stats-grid" id="statsGrid">
         <div class="stat-card stat-card--accent">
           <div class="stat-card__label">Pacientes total</div>
@@ -75,9 +40,9 @@
           <div class="stat-card__sub">en el sistema</div>
         </div>
         <div class="stat-card">
-          <div class="stat-card__label">Pacientes este mes</div>
+          <div class="stat-card__label">Nuevas este mes</div>
           <div class="stat-card__value" id="statMes">—</div>
-          <div class="stat-card__sub">nuevas registradas</div>
+          <div class="stat-card__sub">pacientes registradas</div>
         </div>
         <div class="stat-card">
           <div class="stat-card__label">Citas hoy</div>
@@ -89,11 +54,44 @@
           <div class="stat-card__value" id="statSemana">—</div>
           <div class="stat-card__sub">citas próximas</div>
         </div>
-        <div class="stat-card">
-          <div class="stat-card__label">Solicitudes web</div>
-          <div class="stat-card__value" id="statWeb">—</div>
-          <div class="stat-card__sub"><a href="/platform/solicitudes.html" style="color:var(--plum)">pendientes por revisar</a></div>
+        <div class="stat-card stat-card--green">
+          <div class="stat-card__label">Ingresos del mes</div>
+          <div class="stat-card__value" id="statIngresos">—</div>
+          <div class="stat-card__sub"><a href="/platform/cobros.html" style="color:inherit">ver cobros</a></div>
         </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Embarazos activos</div>
+          <div class="stat-card__value" id="statEmbarazos">—</div>
+          <div class="stat-card__sub"><a href="/platform/prenatal.html" style="color:var(--plum)">ver control prenatal</a></div>
+        </div>
+      </div>
+
+      <!-- Accesos rápidos -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; margin-bottom:22px">
+        <a href="/platform/prenatal.html" class="quick-card">
+          <span style="font-size:22px">🤰</span>
+          <span>Control Prenatal</span>
+        </a>
+        <a href="/platform/recordatorios.html" class="quick-card">
+          <span style="font-size:22px">🔔</span>
+          <span>Recordatorios</span>
+        </a>
+        <a href="/platform/cobros.html" class="quick-card">
+          <span style="font-size:22px">💵</span>
+          <span>Cobros</span>
+        </a>
+        <a href="/platform/reportes.html" class="quick-card">
+          <span style="font-size:22px">📊</span>
+          <span>Reportes</span>
+        </a>
+        <a href="/platform/telemedicina.html" class="quick-card">
+          <span style="font-size:22px">📹</span>
+          <span>Telemedicina</span>
+        </a>
+        <a href="/platform/solicitudes.html" class="quick-card">
+          <span style="font-size:22px">🌐</span>
+          <span>Solicitudes Web</span>
+        </a>
       </div>
 
       <!-- Citas de hoy -->
@@ -107,15 +105,29 @@
         </div>
       </div>
 
-      <!-- Solicitudes web recientes -->
-      <div class="table-wrap">
-        <div class="table-head">
-          <span class="table-head__title">🌐 Últimas solicitudes de cita web</span>
-          <a href="/platform/solicitudes.html" class="btn btn--outline btn--sm">Ver todas</a>
+      <!-- 2 columnas: solicitudes + recordatorios -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px">
+
+        <div class="table-wrap">
+          <div class="table-head">
+            <span class="table-head__title">🌐 Solicitudes web recientes</span>
+            <a href="/platform/solicitudes.html" class="btn btn--outline btn--sm">Ver todas</a>
+          </div>
+          <div id="solicitudesRecientes" style="padding:12px">
+            <div class="empty-state"><p>Cargando...</p></div>
+          </div>
         </div>
-        <div id="solicitudesRecientes" style="padding:12px">
-          <div class="empty-state"><p>Cargando...</p></div>
+
+        <div class="table-wrap">
+          <div class="table-head">
+            <span class="table-head__title">⚠️ Recordatorios pendientes</span>
+            <a href="/platform/recordatorios.html" class="btn btn--outline btn--sm">Ver todos</a>
+          </div>
+          <div id="recordatoriosList" style="padding:12px">
+            <div class="empty-state"><p>Cargando...</p></div>
+          </div>
         </div>
+
       </div>
 
     </div>
@@ -125,23 +137,37 @@
 <script src="/js/platform-api.js"></script>
 <script>
 checkAuth();
-renderUser();
-loadWebBadge();
+renderSidebar('dashboard');
+loadAllBadges();
 
 async function loadDashboard() {
   try {
-    const stats = await API.get('/pacientes/stats');
+    const [stats, cobrosStats, prenatalActivos] = await Promise.all([
+      API.get('/pacientes/stats'),
+      API.get('/cobros/stats').catch(() => ({})),
+      API.get('/prenatal/activos').catch(() => [])
+    ]);
+
     document.getElementById('statTotal').textContent = stats.total;
     document.getElementById('statMes').textContent = stats.mes;
     document.getElementById('statHoy').textContent = stats.citasHoy;
     document.getElementById('statSemana').textContent = stats.citasSemana;
-    document.getElementById('statWeb').textContent = stats.solicitudesWeb;
+    document.getElementById('statIngresos').textContent = formatMXN(cobrosStats.totalMes);
+    document.getElementById('statEmbarazos').textContent = prenatalActivos.length;
+
+    // Alerta recordatorios
+    const recCount = await API.get('/recordatorios/count').catch(() => ({ vencidos: 0 }));
+    if (recCount.vencidos > 0) {
+      const alerta = document.getElementById('alertaRecordatorios');
+      alerta.style.display = 'flex';
+      document.getElementById('alertaRecordatoriosTexto').textContent =
+        `${recCount.vencidos} recordatorio${recCount.vencidos > 1 ? 's' : ''} vencido${recCount.vencidos > 1 ? 's' : ''} — pacientes que requieren seguimiento preventivo`;
+    }
 
     // Citas de hoy
     const today = new Date().toISOString().split('T')[0];
     const citas = await API.get(`/citas?fecha=${today}`);
     const citasDiv = document.getElementById('citasHoyList');
-
     if (!citas.length) {
       citasDiv.innerHTML = '<div class="empty-state"><p>No hay citas programadas para hoy</p></div>';
     } else {
@@ -151,12 +177,12 @@ async function loadDashboard() {
             <div class="cita-row__time-hora">${formatHora(c.hora)}</div>
           </div>
           <div class="cita-row__info">
-            <div class="cita-row__name">${c.nombre ? c.nombre + ' ' + c.apellido_paterno : c.web_nombre || '—'}</div>
-            <div class="cita-row__meta">${c.motivo || c.web_motivo || 'Sin motivo especificado'} · ${tipoLabel(c.tipo)}</div>
+            <div class="cita-row__name">${c.nombre ? c.nombre+' '+c.apellido_paterno : c.web_nombre||'—'}</div>
+            <div class="cita-row__meta">${c.motivo||c.web_motivo||'Sin motivo'} · ${tipoLabel(c.tipo)}</div>
           </div>
           <div class="cita-row__actions">
             <span class="badge badge--${c.estado}">${estadoLabel(c.estado)}</span>
-            ${c.paciente_id ? `<a href="/platform/paciente.html?id=${c.paciente_id}" class="btn btn--sm btn--outline">Ver paciente</a>` : ''}
+            ${c.paciente_id ? `<a href="/platform/paciente.html?id=${c.paciente_id}" class="btn btn--sm btn--outline">Ver</a>` : ''}
           </div>
         </div>
       `).join('');
@@ -165,23 +191,19 @@ async function loadDashboard() {
     // Solicitudes web
     const solic = await API.get('/citas/solicitudes-web');
     const solicDiv = document.getElementById('solicitudesRecientes');
-    const recientes = solic.slice(0, 3);
-
-    if (!recientes.length) {
+    if (!solic.length) {
       solicDiv.innerHTML = '<div class="empty-state"><p>No hay solicitudes pendientes</p></div>';
     } else {
-      solicDiv.innerHTML = recientes.map(s => `
+      solicDiv.innerHTML = solic.slice(0, 3).map(s => `
         <div class="solicitud-card">
           <div class="solicitud-card__header">
             <div class="solicitud-card__name">${s.web_nombre}</div>
-            <div class="solicitud-card__fecha">Solicitó el ${formatDateTime(s.created_at)}</div>
+            <div class="solicitud-card__fecha">${formatDateTime(s.created_at)}</div>
           </div>
           <div class="solicitud-card__info">
             <span>📞 ${s.web_telefono}</span>
-            <span>📅 ${formatDate(s.fecha)} a las ${formatHora(s.hora)}</span>
-            <span>${s.web_es_primera_vez ? '🆕 Primera vez' : '🔄 Seguimiento'}</span>
+            <span>📅 ${formatDate(s.fecha)} ${formatHora(s.hora)}</span>
           </div>
-          ${s.web_motivo ? `<div class="solicitud-card__motivo">"${s.web_motivo}"</div>` : ''}
           <div class="solicitud-card__actions">
             <a href="/platform/solicitudes.html" class="btn btn--primary btn--sm">Gestionar</a>
           </div>
@@ -189,17 +211,48 @@ async function loadDashboard() {
       `).join('');
     }
 
+    // Recordatorios
+    const recs = await API.get('/recordatorios?estado=pendiente').catch(() => []);
+    const recDiv = document.getElementById('recordatoriosList');
+    const hoy = new Date().toISOString().split('T')[0];
+    if (!recs.length) {
+      recDiv.innerHTML = '<div class="empty-state"><p>Sin recordatorios pendientes</p></div>';
+    } else {
+      recDiv.innerHTML = recs.slice(0, 4).map(r => {
+        const vencido = r.fecha_programada < hoy;
+        return `
+          <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--gray-100)">
+            <span style="font-size:16px">${iconoTipoRec(r.tipo)}</span>
+            <div style="flex:1; min-width:0">
+              <div style="font-size:13px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${r.nombre} ${r.apellido_paterno}</div>
+              <div style="font-size:11px; color:${vencido?'#c62828':'var(--gray-400)'}">
+                ${tipoRecLabel(r.tipo)} · ${formatDate(r.fecha_programada)}${vencido?' ⚠️ VENCIDO':''}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
   } catch(e) {
     console.error(e);
   }
 }
 
+function iconoTipoRec(t) {
+  const m = { pap:'🔬', colposcopia:'🔭', mastografia:'🩺', vacuna_vph:'💉', seguimiento:'🔔', otro:'📋' };
+  return m[t] || '📋';
+}
+function tipoRecLabel(t) {
+  const m = { pap:'PAP', colposcopia:'Colposcopía', mastografia:'Mastografía', vacuna_vph:'Vacuna VPH', seguimiento:'Seguimiento', otro:'Otro' };
+  return m[t] || t;
+}
 function tipoLabel(t) {
-  const tipos = { primera_vez: 'Primera vez', seguimiento: 'Seguimiento', urgencia: 'Urgencia', colposcopia: 'Colposcopía', ultrasonido: 'Ultrasonido' };
+  const tipos = { primera_vez:'Primera vez', seguimiento:'Seguimiento', urgencia:'Urgencia', colposcopia:'Colposcopía', ultrasonido:'Ultrasonido' };
   return tipos[t] || t;
 }
 function estadoLabel(e) {
-  const estados = { pendiente: 'Pendiente', confirmada: 'Confirmada', completada: 'Completada', cancelada: 'Cancelada' };
+  const estados = { pendiente:'Pendiente', confirmada:'Confirmada', completada:'Completada', cancelada:'Cancelada' };
   return estados[e] || e;
 }
 

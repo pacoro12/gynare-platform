@@ -9,19 +9,7 @@
 </head>
 <body>
 <div class="app">
-  <aside class="sidebar">
-    <div class="sidebar__brand"><div class="sidebar__brand-name">GYNARE</div><div class="sidebar__brand-sub">Clínica de la Mujer</div></div>
-    <nav class="sidebar__nav">
-      <div class="sidebar__section">Principal</div>
-      <a href="/platform/dashboard.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>Dashboard</a>
-      <a href="/platform/citas.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 1.5v3M11 1.5v3M1.5 7h13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Agenda</a>
-      <a href="/platform/solicitudes.html" class="sidebar__link active"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3.5l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Solicitudes Web<span class="sidebar__badge" id="webBadge" style="display:none">0</span></a>
-      <div class="sidebar__section">Pacientes</div>
-      <a href="/platform/pacientes.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Pacientes</a>
-      <a href="/platform/nueva-paciente.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M1 14c0-3.31 2.69-6 6-6M11 10v4M9 12h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Nueva Paciente</a>
-    </nav>
-    <div class="sidebar__user"><div class="sidebar__user-avatar" id="sidebarAvatar">D</div><div><div class="sidebar__user-name" id="sidebarUserName">Cargando...</div><div class="sidebar__user-role" id="sidebarUserRole">Médico</div></div><button class="sidebar__logout" onclick="logout()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
-  </aside>
+  <aside class="sidebar" id="sidebar"></aside>
 
   <div class="main">
     <header class="topbar">
@@ -56,7 +44,7 @@
 
 <script src="/js/platform-api.js"></script>
 <script>
-checkAuth(); renderUser(); loadWebBadge();
+checkAuth(); renderSidebar('solicitudes'); loadAllBadges();
 
 let solicitudActiva = null;
 
@@ -140,7 +128,7 @@ async function cancelarDirecto(id) {
     await API.post(`/citas/${id}/cancelar`, {});
     toast('Solicitud rechazada', 'ok');
     loadSolicitudes();
-    loadWebBadge();
+    loadAllBadges();
   } catch(e) {
     toast(e.message, 'err');
   }

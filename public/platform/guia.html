@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GYNARE · Guía de uso</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/platform.css">
+  <style>
+    .guia-hero { background: linear-gradient(135deg, var(--plum-dark), var(--plum-mid)); border-radius: 14px; padding: 32px; color: white; margin-bottom: 28px; display: flex; gap: 24px; align-items: center; }
+    .guia-hero__icon { font-size: 52px; flex-shrink: 0; }
+    .guia-hero h1 { font-family: var(--font-serif); font-size: 28px; font-weight: 600; margin-bottom: 6px; }
+    .guia-hero p { opacity: .75; font-size: 14px; line-height: 1.7; }
+    .modulo-card { background: white; border: 1px solid var(--gray-100); border-radius: 14px; overflow: hidden; margin-bottom: 14px; }
+    .modulo-card__header { background: var(--plum); color: white; padding: 16px 20px; display: flex; align-items: center; gap: 14px; cursor: pointer; user-select: none; }
+    .modulo-card__icon { font-size: 22px; flex-shrink: 0; }
+    .modulo-card__title { font-size: 15px; font-weight: 600; flex: 1; }
+    .modulo-card__toggle { font-size: 18px; transition: transform .3s; }
+    .modulo-card__body { padding: 22px 24px; display: none; border-top: 1px solid var(--rose-light); }
+    .modulo-card__body.open { display: block; }
+    .modulo-card__desc { font-size: 14px; color: var(--gray-700); line-height: 1.8; margin-bottom: 16px; }
+    .feature-list { list-style: none; }
+    .feature-list li { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--gray-100); font-size: 13.5px; color: var(--gray-700); line-height: 1.6; }
+    .feature-list li:last-child { border-bottom: none; }
+    .feature-list li::before { content: '✓'; color: var(--plum); font-weight: 700; flex-shrink: 0; }
+    .modulo-card__cta { display: inline-flex; align-items: center; gap: 8px; background: var(--plum); color: white; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 500; margin-top: 16px; transition: background .2s; }
+    .modulo-card__cta:hover { background: var(--plum-dark); }
+    .quick-ref { background: white; border: 1px solid var(--gray-100); border-radius: 14px; padding: 24px; margin-bottom: 20px; }
+    .quick-ref h3 { font-size: 14px; font-weight: 600; color: var(--plum); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .cred-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--gray-50); border-radius: 8px; margin-bottom: 8px; font-size: 13px; }
+    .cred-row__label { color: var(--gray-400); font-size: 12px; margin-bottom: 2px; }
+    .cred-row__value { font-family: monospace; font-size: 13px; font-weight: 600; color: var(--text); }
+    .tips-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 20px; }
+    .tip { background: var(--rose-pale); border-radius: 10px; padding: 16px; border-left: 3px solid var(--plum); }
+    .tip__icon { font-size: 20px; margin-bottom: 8px; }
+    .tip__title { font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+    .tip__desc { font-size: 12px; color: var(--gray-400); line-height: 1.6; }
+    @media (max-width: 700px) { .tips-grid { grid-template-columns: 1fr; } .guia-hero { flex-direction: column; text-align: center; } }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title">Guía de la plataforma</span>
+      <div class="topbar__actions">
+        <a href="/api/guia/pdf" class="btn btn--primary btn--sm" target="_blank">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="2" y="1.5" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 5h4M4.5 7h4M4.5 9h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Descargar PDF
+        </a>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <div class="guia-hero">
+        <div class="guia-hero__icon">📖</div>
+        <div>
+          <h1>Guía completa de GYNARE</h1>
+          <p>Todo lo que puedes hacer desde tu plataforma médica. Haz clic en cada módulo para ver los detalles y acceder directamente.</p>
+        </div>
+      </div>
+
+      <!-- Módulos accordion -->
+
+      <div class="modulo-card">
+        <div class="modulo-card__header" onclick="toggle(this)">
+          <span class="modulo-card__icon">📊</span>
+          <span class="modulo-card__title">Dashboard — Vista general del consultorio</span>
+          <span class="modulo-card__toggle">›</span>
+        </div>
+        <div class="modulo-card__body">
+          <p class="modulo-card__desc">Lo primero que ves al entrar. Muestra todos los indicadores del día y alertas importantes de un vistazo.</p>
+          <ul class="feature-list">
+            <li>Total de pacientes, nuevas del mes, citas de hoy y de la semana</li>
+            <li>Ingresos del mes actual en tiempo real</li>
+            <li>Número de embarazos activos en seguimiento prenatal</li>
+            <li>Alerta visible cuando hay recordatorios preventivos vencidos</li>
+            <li>Lista de citas del día con estado y acceso rápido al expediente</li>
+            <li>Solicitudes de cita recientes desde gynare.com</li>
+            <li>6 accesos rápidos a los módulos principales</li>
+          </ul>
+          <a href="/platform/dashboard.html" class="modulo-card__cta">Ir al dashboard →</a>
+        </div>
+      </div>
+
+      <div class="modulo-card">
+        <div class="modulo-card__header" onclick="toggle(this)">
+          <span class="modulo-card__icon">📅</span>
+          <span class="modulo-card__title">Agenda — Calendario de consultas</span>
+          <span class="modulo-card__toggle">›</span>
+        </div>
+        <div class="modulo-card__body">
+          <p class="modulo-card__desc">Vista diaria y semanal de todas tus citas. Crea, confirma, cancela y gestiona desde aquí.</p>
+          <ul class="feature-list">
+            <li>Vista diaria con todas las citas, horario y estado</li>
+            <li>Tipos: primera vez, seguimiento, urgencia, colposcopía, ultrasonido</li>
+            <li>Estados: pendiente, confirmada, completada, cancelada</li>
+            <li>Nueva cita en 3 clics — búsqueda de paciente por nombre</li>
+            <li>Validación automática de conflicto de horarios</li>
+            <li>Horarios: Lun-Vie 10:00–13:30 y 16:00–19:30 · Sáb 10:00–13:30</li>
+          </ul>
+          <a href="/platform/citas.html" class="modulo-card__cta">Ver agenda →</a>
+        </div>
+      </div>
+
+      <div class="modulo-card">
+        <div class="modulo-card__header" onclick="toggle(this)">
+          <span class="modulo-card__icon">👤</span>
+          <span class="modulo-card__title">Expedientes Clínicos — Historia médica completa</span>
+          <span class="modulo-card__toggle">›</span>
+        </div>
+        <div class="modulo-card__body">
+          <p class="modulo-card__desc">El corazón del sistema. Cada paciente tiene un expediente con 8 pestañas organizadas con toda su información clínica.</p>
+          <ul class="feature-list">
+            <li>Resumen: datos generales, alerta de alergias visible, datos gineco-obstétricos</li>
+            <li>Antecedentes heredofamiliares, patológicos, quirúrgicos y no patológicos</li>
+            <li>Historia gineco-obstétrica: G.P.C.A.V., FUM, PAP, colposcopía, MAC, IVSA</li>
+            <li>Consultas SOAP con signos vitales, exploración y diagnóstico</li>
+            <li>Pestaña Prenatal — embarazos y controles de la paciente</li>
+            <li>Historial de citas y cobros de la paciente</li>
+            <li>Recetas emitidas con descarga de PDF individual</li>
+          </ul>
+          <a href="/platform/pacientes.html" class="modulo-card__cta">Ver pacientes →</a>
+        </div>
+      </div>
+
+      <div class="modulo-card">
+        <div class="modulo-card__header" onclick="toggle(this)" style="background:#6B2A5E">
+          <span class="modulo-card__icon">🤰</span>
+          <span class="modulo-card__title">Control Prenatal — Seguimiento semana a semana</span>
+          <span class="modulo-card__toggle">›</span>
+        </div>
+        <div class="modulo-card__body">
+          <p class="modulo-card__desc">Módulo específico para obstetricia. Registra embarazos con cálculo automático de FPP y controla cada visita prenatal.</p>
+          <ul class="feature-list">
+            <li>Registro de embarazo con FUM → FPP automática (Regla de Naegele)</li>
+            <li>Cálculo automático de semanas de gestación y trimestre</li>
+            <li>Control por visita: peso, TA, FCM, FCF, altura uterina, presentación</li>
+            <li>Registro de ultrasonido, laboratorios, edema, hemoglobina, glucemia</li>
+            <li>Cuenta regresiva de días para FPP con alerta en tercer trimestre</li>
+            <li>Vista de todos los embarazos activos clasificados por trimestre</li>
+          </ul>
+          <a href="/platform/prenatal.html" class="modulo-card__cta">Ver control prenatal →</a>
+        </div>
+      </div>
+
+      <div class="modulo-card">
+        <div class="modulo-card__header" onclick="toggle(this)" style="background:#7b1fa2">
+          <span class="modulo-card__icon">🔔</span>
+          <span class="modulo-card__title">Recordatorios Preventivos — PAP, colposcopía, mastografía</span>
+          <span class="modulo-card__toggle">›</span>
+        </div>
+        <div class="modulo-card__body">
+          <p class="modulo-card__desc">Garantiza que ninguna paciente se quede sin su tamizaje. El sistema detecta pacientes con estudios vencidos automáticamente.</p>
+          <ul class="feature-list">
+            <li>"Generar automáticos" detecta PAP y colposcopía con más de 1 año</li>
+            <li>Tipos: PAP, colposcopía, mastografía, vacuna VPH, seguimiento</li>
+            <li>Alerta amarilla en dashboard cuando hay vencidos</li>
+            <li>Badge rojo en el menú lateral con el número de urgentes</li>
+            <li>Marcar como completado u omitido con un clic</li>
+            <li>Filtro por tipo, estado o paciente</li>
+          </ul>
+          <a href="/platform/recordatorios.html" class="modulo-card__cta">Ver recordatorios →</a>
+        </div>
+      </div>
+
+      <div class="modulo-card">
+        <div class="modulo-card__header" onclick="toggle(this)" style="background:#2e7d32">
+          <span class="modulo-card__icon">💵</span>
+          <span class="modulo-card__title">Cobros — Control financiero del consultorio</span>
+          <span class="modulo-card__toggle">›</span>
+        </div>
+        <div class="modulo-card__body">
+          <p class="modulo-card__desc">Registra honorarios y lleva el control de ingresos mes a mes. Con folio automático y estadísticas comparativas.</p>
+          <ul class="feature-list">
+            <li>Registro de cobros con precios sugeridos por tipo de servicio</li>
+            <li>Folio automático: GYN-00001, GYN-00002...</li>
+            <li>Métodos de pago: efectivo, tarjeta, transferencia</li>
+            <li>Cobros pendientes — marcar pagado con un clic</li>
+            <li>Estadísticas: mes actual, hoy, comparativa vs mes anterior</li>
+            <li>Historial de cobros visible desde el expediente de la paciente</li>
+          </ul>
+          <a href="/platform/cobros.html" class="modulo-card__cta">Ver cobros →</a>
+        </div>
+      </div>
+
+      <div class="modulo-card">
+        <div class="modulo-card__header" onclick="toggle(this)" style="background:#0277bd">
+          <span class="modulo-card__icon">📈</span>
+          <span class="modulo-card__title">Reportes — Estadísticas de la práctica médica</span>
+          <span class="modulo-card__toggle">›</span>
+        </div>
+        <div class="modulo-card__body">
+          <p class="modulo-card__desc">6 gráficas automáticas con datos reales de tu consultorio. Sin hojas de cálculo.</p>
+          <ul class="feature-list">
+            <li>Ingresos de los últimos 12 meses (gráfica de barras)</li>
+            <li>Pacientes nuevas por mes (curva de crecimiento)</li>
+            <li>Distribución de citas por tipo (gráfica de dona)</li>
+            <li>Top 10 diagnósticos más frecuentes</li>
+            <li>KPIs globales: total pacientes, consultas, recetas, ingresos</li>
+            <li>Datos en tiempo real — se actualizan solos</li>
+          </ul>
+          <a href="/platform/reportes.html" class="modulo-card__cta">Ver reportes →</a>
+        </div>
+      </div>
+
+      <div class="modulo-card">
+        <div class="modulo-card__header" onclick="toggle(this)" style="background:#1565c0">
+          <span class="modulo-card__icon">📹</span>
+          <span class="modulo-card__title">Telemedicina — Consultas por videollamada</span>
+          <span class="modulo-card__toggle">›</span>
+        </div>
+        <div class="modulo-card__body">
+          <p class="modulo-card__desc">Genera salas de video privadas para consultar con pacientes a distancia. Sin instalaciones, sin costo adicional.</p>
+          <ul class="feature-list">
+            <li>Genera sala privada con nombre de la paciente en 1 clic</li>
+            <li>Enviar enlace por WhatsApp directamente desde la plataforma</li>
+            <li>Acceso rápido desde las citas del día</li>
+            <li>La paciente solo abre el enlace en su navegador — sin apps</li>
+            <li>Encriptado de extremo a extremo (Jitsi Meet)</li>
+            <li>Compatible con teléfono y computadora</li>
+          </ul>
+          <a href="/platform/telemedicina.html" class="modulo-card__cta">Ir a telemedicina →</a>
+        </div>
+      </div>
+
+      <div class="modulo-card">
+        <div class="modulo-card__header" onclick="toggle(this)">
+          <span class="modulo-card__icon">💊</span>
+          <span class="modulo-card__title">Recetas Digitales — PDF con membrete oficial</span>
+          <span class="modulo-card__toggle">›</span>
+        </div>
+        <div class="modulo-card__body">
+          <p class="modulo-card__desc">Genera recetas médicas profesionales en PDF con el membrete GYNARE, listas para imprimir o enviar.</p>
+          <ul class="feature-list">
+            <li>Acceso desde el expediente de la paciente o al terminar una consulta</li>
+            <li>Agrega uno o varios medicamentos con dosis, frecuencia y duración</li>
+            <li>PDF con membrete oficial: nombre, dirección, cédula médica</li>
+            <li>Historial de recetas en el expediente de cada paciente</li>
+            <li>Imprime o descarga directamente desde el navegador</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Referencia rápida -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 8px">
+
+        <div class="quick-ref">
+          <h3>🔐 Acceso al sistema</h3>
+          <div class="cred-row">
+            <div>
+              <div class="cred-row__label">Doctora — acceso completo</div>
+              <div class="cred-row__value">dra.vaca@gynare.com.mx</div>
+            </div>
+            <div style="text-align:right">
+              <div class="cred-row__label">Contraseña</div>
+              <div class="cred-row__value">Gynare2026!</div>
+            </div>
+          </div>
+          <div class="cred-row">
+            <div>
+              <div class="cred-row__label">Recepción</div>
+              <div class="cred-row__value">recepcion@gynare.com.mx</div>
+            </div>
+            <div style="text-align:right">
+              <div class="cred-row__label">Contraseña</div>
+              <div class="cred-row__value">Admin2026!</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;font-size:12px;color:var(--gray-400)">
+            URL: gynare.com/platform/login.html<br>
+            Sesión: 12 horas automáticas
+          </div>
+        </div>
+
+        <div class="quick-ref">
+          <h3>💡 Consejos clave</h3>
+          <div class="tips-grid" style="grid-template-columns: 1fr">
+            <div class="tip">
+              <div class="tip__icon">🤖</div>
+              <div class="tip__title">Genera recordatorios automáticos</div>
+              <div class="tip__desc">Usa "Generar automáticos" en Recordatorios para detectar pacientes con estudios vencidos de un solo golpe.</div>
+            </div>
+            <div class="tip">
+              <div class="tip__icon">📹</div>
+              <div class="tip__title">Telemedicina desde la agenda</div>
+              <div class="tip__desc">En Telemedicina, en la sección "Citas de hoy", cada cita tiene un botón 📹 para generar la sala directamente.</div>
+            </div>
+            <div class="tip">
+              <div class="tip__icon">🔔</div>
+              <div class="tip__title">Notificaciones de citas web</div>
+              <div class="tip__desc">Configura EMAIL_PASS en Railway para recibir un correo cuando una paciente agende desde gynare.com.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="/js/platform-api.js"></script>
+<script>
+checkAuth();
+renderSidebar('guia');
+loadAllBadges();
+
+function toggle(header) {
+  const body = header.nextElementSibling;
+  const arrow = header.querySelector('.modulo-card__toggle');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arrow.style.transform = isOpen ? '' : 'rotate(90deg)';
+}
+</script>
+</body>
+</html>

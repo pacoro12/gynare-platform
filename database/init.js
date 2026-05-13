@@ -168,6 +168,88 @@ function initDatabase() {
     )
   `);
 
+  // Control Prenatal
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS embarazos (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      paciente_id INTEGER NOT NULL REFERENCES pacientes(id),
+      fum DATE,
+      fpp DATE,
+      semanas_al_ingresar INTEGER,
+      tipo_embarazo TEXT DEFAULT 'único',
+      via_resolucion TEXT,
+      fecha_resolucion DATE,
+      rn_peso REAL,
+      rn_talla REAL,
+      rn_apgar TEXT,
+      rn_sexo TEXT,
+      complicaciones TEXT,
+      estado TEXT DEFAULT 'activo',
+      notas TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS controles_prenatales (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      embarazo_id INTEGER NOT NULL REFERENCES embarazos(id),
+      paciente_id INTEGER NOT NULL REFERENCES pacientes(id),
+      fecha DATE NOT NULL,
+      semanas INTEGER,
+      peso REAL,
+      tension_arterial TEXT,
+      fcm INTEGER,
+      fcf INTEGER,
+      altura_uterina REAL,
+      presentacion TEXT,
+      movimientos_fetales TEXT,
+      edema TEXT,
+      proteinas TEXT,
+      hemoglobina REAL,
+      glucemia REAL,
+      ultrasonido TEXT,
+      laboratorios TEXT,
+      diagnostico TEXT,
+      plan TEXT,
+      proxima_cita DATE,
+      notas TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Cobros / Billing
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS cobros (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      paciente_id INTEGER REFERENCES pacientes(id),
+      consulta_id INTEGER REFERENCES consultas(id),
+      usuario_id INTEGER REFERENCES usuarios(id),
+      concepto TEXT NOT NULL,
+      monto REAL NOT NULL,
+      metodo_pago TEXT DEFAULT 'efectivo',
+      estado TEXT DEFAULT 'pagado',
+      fecha DATE NOT NULL,
+      folio TEXT,
+      notas TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  // Recordatorios Preventivos
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS recordatorios (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      paciente_id INTEGER NOT NULL REFERENCES pacientes(id),
+      tipo TEXT NOT NULL,
+      descripcion TEXT,
+      fecha_programada DATE NOT NULL,
+      estado TEXT DEFAULT 'pendiente',
+      notas TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
   // Crear usuario admin por defecto si no existe
   const adminExists = db.prepare('SELECT id FROM usuarios WHERE email = ?').get('dra.vaca@gynare.com.mx');
   if (!adminExists) {

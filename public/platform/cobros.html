@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GYNARE · Cobros</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/platform.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title">Cobros y Pagos</span>
+      <div class="topbar__actions">
+        <button class="btn btn--primary btn--sm" onclick="abrirModal()">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5v10M1.5 6.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Registrar Cobro
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- Stats -->
+      <div class="stats-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 24px">
+        <div class="stat-card stat-card--green">
+          <div class="stat-card__label">Ingresos este mes</div>
+          <div class="stat-card__value" id="statMes">—</div>
+          <div class="stat-card__sub" id="statNumMes"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Ingresos de hoy</div>
+          <div class="stat-card__value" id="statHoy">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card__label">Mes anterior</div>
+          <div class="stat-card__value" id="statAnterior">—</div>
+          <div class="stat-card__sub" id="statVariacion"></div>
+        </div>
+        <div class="stat-card" style="border-left: 3px solid var(--warning)">
+          <div class="stat-card__label">Pendiente cobrar</div>
+          <div class="stat-card__value" id="statPendiente" style="color:var(--warning)">—</div>
+          <div class="stat-card__sub" id="statNumPendiente"></div>
+        </div>
+      </div>
+
+      <!-- Filtros + tabla -->
+      <div class="table-wrap">
+        <div class="table-head">
+          <span class="table-head__title">💵 Cobros registrados</span>
+          <div class="table-head__tools">
+            <input type="month" id="filtroMes" class="search-input" style="width:160px; padding:8px 12px" oninput="cargarCobros()">
+            <select id="filtroMetodo" class="search-input" style="width:130px; padding:8px 12px; background-image:none" onchange="cargarCobros()">
+              <option value="">Todos</option>
+              <option value="efectivo">Efectivo</option>
+              <option value="tarjeta">Tarjeta</option>
+              <option value="transferencia">Transferencia</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="cobrosLista">
+          <div class="empty-state"><p>Cargando...</p></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Registrar cobro -->
+<div class="modal-overlay hidden" id="modalCobro">
+  <div class="modal">
+    <div class="modal__header">
+      <span class="modal__title">Registrar cobro</span>
+      <button class="modal__close" onclick="cerrarModal()">✕</button>
+    </div>
+    <div class="modal__body">
+      <div class="form-grid form-grid--2">
+        <div class="form-group form-group--full">
+          <label>Paciente (opcional)</label>
+          <input type="text" id="cBuscarPaciente" placeholder="Buscar por nombre..." oninput="buscarPacientes(this.value)" autocomplete="off">
+          <div id="cSugerencias" style="position:relative"></div>
+          <input type="hidden" id="cPacienteId">
+        </div>
+        <div class="form-group form-group--full">
+          <label>Concepto *</label>
+          <select id="cConcepto" onchange="aplicarConcepto(this.value)">
+            <option value="">Seleccionar o escribir...</option>
+            <option value="Consulta primera vez">Consulta primera vez</option>
+            <option value="Consulta seguimiento">Consulta seguimiento</option>
+            <option value="Colposcopía">Colposcopía</option>
+            <option value="Ultrasonido obstétrico">Ultrasonido obstétrico</option>
+            <option value="Ultrasonido Doppler 3D/4D">Ultrasonido Doppler 3D/4D</option>
+            <option value="Papanicolaou">Papanicolaou</option>
+            <option value="Control prenatal">Control prenatal</option>
+            <option value="Urgencia ginecológica">Urgencia ginecológica</option>
+            <option value="Otro">Otro</option>
+          </select>
+          <input type="text" id="cConceptoTexto" placeholder="O escribe el concepto..." style="margin-top:8px">
+        </div>
+        <div class="form-group">
+          <label>Monto (MXN) *</label>
+          <input type="number" id="cMonto" min="0" step="10" placeholder="0.00">
+        </div>
+        <div class="form-group">
+          <label>Método de pago</label>
+          <select id="cMetodo">
+            <option value="efectivo">Efectivo</option>
+            <option value="tarjeta">Tarjeta</option>
+            <option value="transferencia">Transferencia</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Fecha</label>
+          <input type="date" id="cFecha">
+        </div>
+        <div class="form-group">
+          <label>Estado</label>
+          <select id="cEstado">
+            <option value="pagado">Pagado</option>
+            <option value="pendiente">Pendiente</option>
+          </select>
+        </div>
+        <div class="form-group form-group--full">
+          <label>Notas</label>
+          <textarea id="cNotas" rows="2"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--outline" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn--primary" onclick="guardarCobro()">Registrar cobro</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/platform-api.js"></script>
+<script>
+checkAuth();
+renderSidebar('cobros');
+loadAllBadges();
+
+const hoy = new Date().toISOString().split('T')[0];
+const mesActual = hoy.slice(0, 7);
+document.getElementById('filtroMes').value = mesActual;
+document.getElementById('cFecha').value = hoy;
+
+async function cargarStats() {
+  try {
+    const s = await API.get('/cobros/stats');
+    document.getElementById('statMes').textContent = formatMXN(s.totalMes);
+    document.getElementById('statNumMes').textContent = `${s.numCobrosM} cobro${s.numCobrosM !== 1 ? 's' : ''}`;
+    document.getElementById('statHoy').textContent = formatMXN(s.totalHoy);
+    document.getElementById('statAnterior').textContent = formatMXN(s.totalMesAnterior);
+    const variacion = s.totalMesAnterior > 0
+      ? Math.round(((s.totalMes - s.totalMesAnterior) / s.totalMesAnterior) * 100)
+      : null;
+    if (variacion !== null) {
+      const el = document.getElementById('statVariacion');
+      el.textContent = `${variacion >= 0 ? '▲' : '▼'} ${Math.abs(variacion)}% vs mes ant.`;
+      el.style.color = variacion >= 0 ? 'var(--success)' : 'var(--error)';
+    }
+    document.getElementById('statPendiente').textContent = formatMXN(s.pendientesMonto);
+    document.getElementById('statNumPendiente').textContent = `${s.pendientesNum} cobro${s.pendientesNum !== 1 ? 's' : ''} sin pagar`;
+  } catch(e) { console.error(e); }
+}
+
+async function cargarCobros() {
+  const mes = document.getElementById('filtroMes').value;
+  const metodo = document.getElementById('filtroMetodo').value;
+  let url = '/cobros?';
+  if (mes) url += `mes=${mes}&`;
+  if (metodo) url += `metodo=${metodo}&`;
+
+  try {
+    const cobros = await API.get(url);
+    const div = document.getElementById('cobrosLista');
+    if (!cobros.length) {
+      div.innerHTML = '<div class="empty-state"><p>Sin cobros en este período</p></div>';
+      return;
+    }
+    div.innerHTML = cobros.map(c => `
+      <div class="cobro-row">
+        <div class="cobro-row__info">
+          <div class="cobro-row__concepto">${c.concepto}</div>
+          <div class="cobro-row__meta">
+            ${c.nombre ? `${c.nombre} ${c.apellido_paterno} · ` : ''}
+            ${formatDate(c.fecha)} · ${metodoIcon(c.metodo_pago)} ${metodoLabel(c.metodo_pago)}
+            · Folio ${c.folio}
+          </div>
+        </div>
+        <span class="badge ${c.estado === 'pagado' ? 'badge--pagado' : c.estado === 'pendiente' ? 'badge--pendiente' : 'badge--cancelada'}">${estadoLabel(c.estado)}</span>
+        <div class="cobro-row__monto ${c.estado !== 'pagado' ? 'cobro-row__monto--pendiente' : ''}">${formatMXN(c.monto)}</div>
+        <div style="display:flex;gap:4px">
+          ${c.estado === 'pendiente' ? `<button class="btn btn--sm" style="background:#e8f5e9;color:#2e7d32;border:none" onclick="marcarPagado(${c.id})">Marcar pagado</button>` : ''}
+          <button class="btn btn--sm btn--danger" onclick="cancelarCobro(${c.id})">✕</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) { console.error(e); }
+}
+
+function metodoIcon(m) {
+  const i = { efectivo: '💵', tarjeta: '💳', transferencia: '🏦' };
+  return i[m] || '💰';
+}
+function metodoLabel(m) {
+  const l = { efectivo: 'Efectivo', tarjeta: 'Tarjeta', transferencia: 'Transferencia' };
+  return l[m] || m;
+}
+function estadoLabel(e) {
+  const l = { pagado: 'Pagado', pendiente: 'Pendiente', cancelado: 'Cancelado' };
+  return l[e] || e;
+}
+
+function abrirModal() { document.getElementById('modalCobro').classList.remove('hidden'); }
+function cerrarModal() {
+  document.getElementById('modalCobro').classList.add('hidden');
+  document.getElementById('cPacienteId').value = '';
+  document.getElementById('cBuscarPaciente').value = '';
+  document.getElementById('cConcepto').value = '';
+  document.getElementById('cConceptoTexto').value = '';
+  document.getElementById('cMonto').value = '';
+}
+
+function aplicarConcepto(val) {
+  const precios = {
+    'Consulta primera vez': 800, 'Consulta seguimiento': 600,
+    'Colposcopía': 1200, 'Ultrasonido obstétrico': 900,
+    'Ultrasonido Doppler 3D/4D': 1400, 'Papanicolaou': 700,
+    'Control prenatal': 700, 'Urgencia ginecológica': 1000
+  };
+  if (val && val !== 'Otro') {
+    document.getElementById('cConceptoTexto').value = val;
+    if (precios[val]) document.getElementById('cMonto').value = precios[val];
+  }
+}
+
+let busTimer;
+async function buscarPacientes(q) {
+  clearTimeout(busTimer);
+  if (q.length < 2) { document.getElementById('cSugerencias').innerHTML = ''; return; }
+  busTimer = setTimeout(async () => {
+    try {
+      const data = await API.get(`/pacientes?q=${encodeURIComponent(q)}&limit=5`);
+      const div = document.getElementById('cSugerencias');
+      if (!data.pacientes.length) { div.innerHTML = ''; return; }
+      div.innerHTML = `<div style="position:absolute;top:0;left:0;right:0;background:white;border:1.5px solid var(--gray-200);border-radius:8px;box-shadow:var(--shadow-md);z-index:100;max-height:180px;overflow-y:auto">
+        ${data.pacientes.map(p => `
+          <div onclick="document.getElementById('cPacienteId').value=${p.id};document.getElementById('cBuscarPaciente').value='${p.nombre} ${p.apellido_paterno}';document.getElementById('cSugerencias').innerHTML=''"
+            style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--gray-100)"
+            onmouseenter="this.style.background='var(--gray-50)'" onmouseleave="this.style.background=''">
+            ${p.nombre} ${p.apellido_paterno}
+          </div>
+        `).join('')}
+      </div>`;
+    } catch {}
+  }, 300);
+}
+
+async function guardarCobro() {
+  const concepto = document.getElementById('cConceptoTexto').value.trim() || document.getElementById('cConcepto').value;
+  const monto = document.getElementById('cMonto').value;
+  if (!concepto) { toast('El concepto es requerido', 'err'); return; }
+  if (!monto) { toast('El monto es requerido', 'err'); return; }
+
+  try {
+    await API.post('/cobros', {
+      paciente_id: document.getElementById('cPacienteId').value || null,
+      concepto, monto: Number(monto),
+      metodo_pago: document.getElementById('cMetodo').value,
+      fecha: document.getElementById('cFecha').value,
+      estado: document.getElementById('cEstado').value,
+      notas: document.getElementById('cNotas').value
+    });
+    toast('Cobro registrado', 'ok');
+    cerrarModal();
+    cargarCobros();
+    cargarStats();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+async function marcarPagado(id) {
+  try {
+    await API.put(`/cobros/${id}`, { estado: 'pagado' });
+    toast('Marcado como pagado', 'ok');
+    cargarCobros(); cargarStats();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+async function cancelarCobro(id) {
+  if (!confirm('¿Cancelar este cobro?')) return;
+  try {
+    await API.del(`/cobros/${id}`);
+    toast('Cobro cancelado', 'ok');
+    cargarCobros(); cargarStats();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+document.getElementById('modalCobro').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalCobro')) cerrarModal();
+});
+
+cargarStats();
+cargarCobros();
+</script>
+</body>
+</html>

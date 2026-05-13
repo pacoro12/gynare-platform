@@ -232,7 +232,31 @@
 
 <script src="/js/platform-api.js"></script>
 <script>
-checkAuth(); renderSidebar('nueva-paciente'); loadAllBadges();
+checkAuth(); renderSidebar('pacientes'); loadAllBadges();
+
+const params = new URLSearchParams(location.search);
+const pacienteId = params.get('id');
+if (!pacienteId) location.href = '/platform/pacientes.html';
+
+// Cambiar título y botón
+document.querySelector('.topbar__title').textContent = 'Editar Paciente';
+document.getElementById('submitBtn').textContent = 'Guardar cambios';
+
+// Precargar datos
+async function precargarPaciente() {
+  try {
+    const p = await API.get(`/pacientes/${pacienteId}`);
+    const form = document.getElementById('pacienteForm');
+    // Llenar todos los campos del formulario
+    Object.keys(p).forEach(key => {
+      const el = form.querySelector(`[name="${key}"]`);
+      if (!el) return;
+      if (el.type === 'checkbox') { el.checked = !!p[key]; }
+      else { el.value = p[key] !== null && p[key] !== undefined ? p[key] : ''; }
+    });
+    document.querySelector('.topbar__title').textContent = `Editar: ${p.nombre} ${p.apellido_paterno}`;
+  } catch(e) { toast('Error cargando paciente', 'err'); }
+}
 
 document.getElementById('pacienteForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -244,14 +268,16 @@ document.getElementById('pacienteForm').addEventListener('submit', async (e) => 
   new FormData(form).forEach((v, k) => { data[k] = v; });
 
   try {
-    const result = await API.post('/pacientes', data);
-    toast('Paciente registrada correctamente', 'ok');
-    setTimeout(() => window.location.href = `/platform/paciente.html?id=${result.id}`, 800);
+    await API.put(`/pacientes/${pacienteId}`, data);
+    toast('Paciente actualizada', 'ok');
+    setTimeout(() => window.location.href = `/platform/paciente.html?id=${pacienteId}`, 800);
   } catch(err) {
-    toast(err.message || 'Error al registrar', 'err');
-    btn.disabled = false; btn.textContent = 'Registrar Paciente';
+    toast(err.message || 'Error al actualizar', 'err');
+    btn.disabled = false; btn.textContent = 'Guardar cambios';
   }
 });
+
+precargarPaciente();
 </script>
 </body>
 </html>

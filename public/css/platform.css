@@ -449,6 +449,137 @@ tr:hover td { background: var(--gray-50); }
 .page-btn:hover:not(.active) { border-color: var(--plum); color: var(--plum); }
 .page-info { font-size: 12px; color: var(--gray-400); padding: 0 8px; }
 
+/* ---- STAT CARD VARIANTES ---- */
+.stat-card--green { background: #f1f8e9; border-color: #c5e1a5; }
+.stat-card--green .stat-card__value { color: #2e7d32; }
+.stat-card--green .stat-card__sub a { color: #2e7d32; }
+
+/* ---- QUICK CARDS (acceso rápido dashboard) ---- */
+.quick-card {
+  background: var(--white);
+  border: 1.5px solid var(--gray-100);
+  border-radius: var(--radius);
+  padding: 18px 12px;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--gray-700); text-align: center;
+  transition: all .2s; cursor: pointer;
+}
+.quick-card:hover { border-color: var(--plum); color: var(--plum); box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+
+/* ---- PRENATAL / EMBARAZO ---- */
+.embarazo-card {
+  background: var(--white);
+  border: 1px solid var(--gray-100);
+  border-radius: var(--radius);
+  padding: 20px;
+  border-left: 4px solid #9c27b0;
+  margin-bottom: 12px;
+  display: flex; align-items: flex-start; gap: 16px;
+}
+.embarazo-card__weeks {
+  background: #9c27b0;
+  color: var(--white);
+  border-radius: 10px;
+  padding: 10px 16px;
+  text-align: center; flex-shrink: 0; min-width: 70px;
+}
+.embarazo-card__weeks-num { font-size: 24px; font-weight: 700; line-height: 1; }
+.embarazo-card__weeks-label { font-size: 10px; opacity: .8; margin-top: 2px; }
+.embarazo-card__info { flex: 1; }
+.embarazo-card__name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+.embarazo-card__meta { font-size: 12.5px; color: var(--gray-400); line-height: 1.7; }
+.embarazo-card__actions { display: flex; gap: 6px; align-items: center; }
+
+/* ---- COBROS / BILLING ---- */
+.cobro-row {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--gray-100);
+  transition: background .15s;
+}
+.cobro-row:last-child { border-bottom: none; }
+.cobro-row:hover { background: var(--gray-50); }
+.cobro-row__monto { font-size: 17px; font-weight: 600; color: var(--success); font-family: var(--font-serif); flex-shrink: 0; min-width: 100px; text-align: right; }
+.cobro-row__monto--pendiente { color: var(--warning); }
+.cobro-row__info { flex: 1; }
+.cobro-row__concepto { font-size: 13.5px; font-weight: 500; }
+.cobro-row__meta { font-size: 11.5px; color: var(--gray-400); margin-top: 2px; }
+
+/* ---- RECORDATORIOS ---- */
+.rec-card {
+  background: var(--white);
+  border: 1px solid var(--gray-100);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 8px;
+  transition: box-shadow .2s;
+}
+.rec-card:hover { box-shadow: var(--shadow-sm); }
+.rec-card--vencido { border-left: 4px solid var(--error); background: #fff5f5; }
+.rec-card--pronto { border-left: 4px solid var(--warning); }
+.rec-card__icon { font-size: 24px; flex-shrink: 0; }
+.rec-card__info { flex: 1; }
+.rec-card__nombre { font-size: 14px; font-weight: 500; }
+.rec-card__tipo { font-size: 12px; color: var(--gray-400); margin-top: 2px; }
+.rec-card__fecha { font-size: 12px; font-weight: 500; }
+.rec-card__actions { display: flex; gap: 6px; }
+
+/* ---- REPORTES / CHARTS ---- */
+.chart-wrap {
+  background: var(--white);
+  border: 1px solid var(--gray-100);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.chart-wrap h3 { font-size: 14px; font-weight: 500; margin-bottom: 20px; color: var(--gray-700); }
+
+/* ---- TELEMEDICINA ---- */
+.tele-card {
+  background: var(--white);
+  border: 1px solid var(--gray-100);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 12px;
+}
+.tele-card__room {
+  background: var(--plum);
+  color: var(--white);
+  border-radius: 10px;
+  padding: 16px 20px;
+  font-family: monospace; font-size: 15px;
+  letter-spacing: .05em; word-break: break-all;
+  margin: 12px 0;
+}
+.badge--pagado { background: #e8f5e9; color: #2e7d32; }
+.badge--pendiente-cobro { background: #fff3e0; color: #e65100; }
+.badge--cancelado-cobro { background: #f5f5f5; color: #757575; }
+
+/* ---- MODAL ---- */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 16px;
+}
+.modal-overlay.hidden { display: none; }
+.modal {
+  background: var(--white);
+  border-radius: 16px;
+  width: 100%; max-width: 520px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+}
+.modal__header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal__title { font-size: 15px; font-weight: 500; }
+.modal__close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--gray-400); line-height: 1; }
+.modal__body { padding: 24px; }
+.modal__footer { padding: 16px 24px; border-top: 1px solid var(--gray-100); display: flex; justify-content: flex-end; gap: 10px; }
+
 /* ============== RESPONSIVE ============== */
 @media (max-width: 800px) {
   .sidebar { transform: translateX(-100%); }

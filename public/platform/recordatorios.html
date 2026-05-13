@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GYNARE · Recordatorios Preventivos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/platform.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title">Recordatorios Preventivos</span>
+      <div class="topbar__actions">
+        <button class="btn btn--secondary btn--sm" onclick="generarAuto()">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 6.5A4.5 4.5 0 0111 6.5M11 4v2.5H8.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Generar automáticos
+        </button>
+        <button class="btn btn--primary btn--sm" onclick="abrirModal()">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5v10M1.5 6.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Nuevo recordatorio
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <div style="background:#f3e5f5;border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:#6a1b9a;line-height:1.7">
+        <strong>¿Cómo funciona?</strong> El sistema detecta pacientes con PAP o colposcopía vencidos (&gt;1 año) y genera recordatorios automáticamente. También puedes crear recordatorios manuales para mastografía, vacuna VPH, seguimientos, etc.
+      </div>
+
+      <!-- Tabs vencidos / próximos / todos -->
+      <div class="tabs" style="margin-bottom:20px">
+        <button class="tab-btn active" onclick="filtrarRecs('pendiente', this)">Pendientes</button>
+        <button class="tab-btn" onclick="filtrarRecs('completado', this)">Completados</button>
+        <button class="tab-btn" onclick="filtrarRecs('', this)">Todos</button>
+      </div>
+
+      <!-- Filtro por tipo -->
+      <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap">
+        <button class="btn btn--sm btn--outline" onclick="filtrarTipo('', this)" id="btnTodosTipos">Todos</button>
+        <button class="btn btn--sm btn--outline" onclick="filtrarTipo('pap', this)">🔬 PAP</button>
+        <button class="btn btn--sm btn--outline" onclick="filtrarTipo('colposcopia', this)">🔭 Colposcopía</button>
+        <button class="btn btn--sm btn--outline" onclick="filtrarTipo('mastografia', this)">🩺 Mastografía</button>
+        <button class="btn btn--sm btn--outline" onclick="filtrarTipo('vacuna_vph', this)">💉 Vacuna VPH</button>
+        <button class="btn btn--sm btn--outline" onclick="filtrarTipo('seguimiento', this)">🔔 Seguimiento</button>
+      </div>
+
+      <div id="recsList">
+        <div class="empty-state"><p>Cargando...</p></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nuevo recordatorio -->
+<div class="modal-overlay hidden" id="modalRec">
+  <div class="modal">
+    <div class="modal__header">
+      <span class="modal__title">Nuevo recordatorio preventivo</span>
+      <button class="modal__close" onclick="cerrarModal()">✕</button>
+    </div>
+    <div class="modal__body">
+      <div class="form-grid form-grid--2">
+        <div class="form-group form-group--full">
+          <label>Paciente *</label>
+          <input type="text" id="rBuscarPaciente" placeholder="Buscar por nombre..." oninput="buscarPacientes(this.value)" autocomplete="off">
+          <div id="rSugerencias" style="position:relative"></div>
+          <input type="hidden" id="rPacienteId">
+        </div>
+        <div class="form-group">
+          <label>Tipo *</label>
+          <select id="rTipo">
+            <option value="pap">PAP (Papanicolaou)</option>
+            <option value="colposcopia">Colposcopía</option>
+            <option value="mastografia">Mastografía</option>
+            <option value="vacuna_vph">Vacuna VPH</option>
+            <option value="seguimiento">Seguimiento general</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Fecha programada *</label>
+          <input type="date" id="rFecha">
+        </div>
+        <div class="form-group form-group--full">
+          <label>Descripción / Motivo</label>
+          <textarea id="rDescripcion" rows="2"></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal__footer">
+      <button class="btn btn--outline" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn--primary" onclick="guardarRecordatorio()">Crear recordatorio</button>
+    </div>
+  </div>
+</div>
+
+<script src="/js/platform-api.js"></script>
+<script>
+checkAuth();
+renderSidebar('recordatorios');
+loadAllBadges();
+
+const hoy = new Date().toISOString().split('T')[0];
+document.getElementById('rFecha').value = hoy;
+
+let estadoFiltro = 'pendiente';
+let tipoFiltro = '';
+
+function filtrarRecs(estado, btn) {
+  estadoFiltro = estado;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  cargarRecordatorios();
+}
+
+function filtrarTipo(tipo, btn) {
+  tipoFiltro = tipo;
+  document.querySelectorAll('[onclick^="filtrarTipo"]').forEach(b => b.classList.remove('btn--primary'));
+  document.querySelectorAll('[onclick^="filtrarTipo"]').forEach(b => b.classList.add('btn--outline'));
+  btn.classList.remove('btn--outline');
+  btn.classList.add('btn--primary');
+  cargarRecordatorios();
+}
+
+async function cargarRecordatorios() {
+  try {
+    let url = '/recordatorios?';
+    if (estadoFiltro) url += `estado=${estadoFiltro}&`;
+    if (tipoFiltro) url += `tipo=${tipoFiltro}&`;
+    const recs = await API.get(url);
+    const div = document.getElementById('recsList');
+
+    if (!recs.length) {
+      div.innerHTML = '<div class="empty-state"><p>Sin recordatorios en esta categoría</p></div>';
+      return;
+    }
+
+    div.innerHTML = recs.map(r => {
+      const vencido = r.fecha_programada < hoy && r.estado === 'pendiente';
+      const proximo = !vencido && r.fecha_programada <= addDays(hoy, 30) && r.estado === 'pendiente';
+      return `
+        <div class="rec-card ${vencido ? 'rec-card--vencido' : proximo ? 'rec-card--pronto' : ''}">
+          <div class="rec-card__icon">${iconoTipo(r.tipo)}</div>
+          <div class="rec-card__info">
+            <div class="rec-card__nombre">${r.nombre} ${r.apellido_paterno}</div>
+            <div class="rec-card__tipo">
+              ${tipoLabel(r.tipo)}
+              ${r.descripcion ? ` · ${r.descripcion}` : ''}
+              ${r.telefono ? ` · 📞 ${r.telefono}` : ''}
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div class="rec-card__fecha" style="color:${vencido ? 'var(--error)' : proximo ? 'var(--warning)' : 'var(--gray-700)'}">
+              ${vencido ? '⚠️ VENCIDO' : proximo ? '⏰ PRÓXIMO' : ''}
+              <br>${formatDate(r.fecha_programada)}
+            </div>
+          </div>
+          <div class="rec-card__actions">
+            ${r.estado === 'pendiente' ? `
+              <button class="btn btn--sm" style="background:#e8f5e9;color:#2e7d32;border:none" onclick="marcarCompletado(${r.id})">✓ Completado</button>
+              <button class="btn btn--sm" style="background:#fff3e0;color:#e65100;border:none" onclick="omitir(${r.id})">Omitir</button>
+            ` : `
+              <span class="badge badge--completada">${estadoLabel(r.estado)}</span>
+            `}
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+
+function addDays(dateStr, days) {
+  const d = new Date(dateStr + 'T12:00:00');
+  d.setDate(d.getDate() + days);
+  return d.toISOString().split('T')[0];
+}
+
+function iconoTipo(t) {
+  const m = { pap:'🔬', colposcopia:'🔭', mastografia:'🩺', vacuna_vph:'💉', seguimiento:'🔔', otro:'📋' };
+  return m[t] || '📋';
+}
+function tipoLabel(t) {
+  const m = { pap:'PAP (Papanicolaou)', colposcopia:'Colposcopía', mastografia:'Mastografía', vacuna_vph:'Vacuna VPH', seguimiento:'Seguimiento', otro:'Otro' };
+  return m[t] || t;
+}
+function estadoLabel(e) {
+  const m = { pendiente:'Pendiente', completado:'Completado', omitido:'Omitido' };
+  return m[e] || e;
+}
+
+async function marcarCompletado(id) {
+  try {
+    await API.put(`/recordatorios/${id}`, { estado: 'completado' });
+    toast('Marcado como completado', 'ok');
+    cargarRecordatorios(); loadAllBadges();
+  } catch(e) { toast(e.message, 'err'); }
+}
+async function omitir(id) {
+  try {
+    await API.put(`/recordatorios/${id}`, { estado: 'omitido' });
+    toast('Recordatorio omitido', 'ok');
+    cargarRecordatorios(); loadAllBadges();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+async function generarAuto() {
+  try {
+    const r = await API.post('/recordatorios/auto', {});
+    toast(r.mensaje, 'ok');
+    cargarRecordatorios(); loadAllBadges();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+function abrirModal() { document.getElementById('modalRec').classList.remove('hidden'); }
+function cerrarModal() { document.getElementById('modalRec').classList.add('hidden'); }
+
+let busTimer;
+async function buscarPacientes(q) {
+  clearTimeout(busTimer);
+  if (q.length < 2) { document.getElementById('rSugerencias').innerHTML = ''; return; }
+  busTimer = setTimeout(async () => {
+    try {
+      const data = await API.get(`/pacientes?q=${encodeURIComponent(q)}&limit=5`);
+      const div = document.getElementById('rSugerencias');
+      if (!data.pacientes.length) { div.innerHTML = ''; return; }
+      div.innerHTML = `<div style="position:absolute;top:0;left:0;right:0;background:white;border:1.5px solid var(--gray-200);border-radius:8px;box-shadow:var(--shadow-md);z-index:100;max-height:180px;overflow-y:auto">
+        ${data.pacientes.map(p => `
+          <div onclick="document.getElementById('rPacienteId').value=${p.id};document.getElementById('rBuscarPaciente').value='${p.nombre} ${p.apellido_paterno}';document.getElementById('rSugerencias').innerHTML=''"
+            style="padding:10px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--gray-100)"
+            onmouseenter="this.style.background='var(--gray-50)'" onmouseleave="this.style.background=''">
+            ${p.nombre} ${p.apellido_paterno}
+          </div>
+        `).join('')}
+      </div>`;
+    } catch {}
+  }, 300);
+}
+
+async function guardarRecordatorio() {
+  const pid = document.getElementById('rPacienteId').value;
+  const fecha = document.getElementById('rFecha').value;
+  const tipo = document.getElementById('rTipo').value;
+  if (!pid) { toast('Selecciona una paciente', 'err'); return; }
+  if (!fecha) { toast('La fecha es requerida', 'err'); return; }
+  try {
+    await API.post('/recordatorios', {
+      paciente_id: pid, tipo, fecha_programada: fecha,
+      descripcion: document.getElementById('rDescripcion').value
+    });
+    toast('Recordatorio creado', 'ok');
+    cerrarModal(); cargarRecordatorios(); loadAllBadges();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+document.getElementById('modalRec').addEventListener('click', e => {
+  if (e.target === document.getElementById('modalRec')) cerrarModal();
+});
+
+cargarRecordatorios();
+</script>
+</body>
+</html>

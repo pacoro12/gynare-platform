@@ -19,6 +19,10 @@ app.use('/api/citas', require('./routes/citas'));
 app.use('/api/consultas', require('./routes/consultas'));
 app.use('/api/recetas', require('./routes/recetas'));
 app.use('/api/publica', require('./routes/publica'));
+app.use('/api/prenatal', require('./routes/prenatal'));
+app.use('/api/cobros', require('./routes/cobros'));
+app.use('/api/recordatorios', require('./routes/recordatorios'));
+app.use('/api/reportes', require('./routes/reportes'));
 
 // SPA fallback para la plataforma
 app.get('/platform*', (req, res) => {
@@ -29,6 +33,7 @@ app.get('/platform*', (req, res) => {
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
+
 
 app.listen(PORT, () => {
   console.log(`✅ GYNARE corriendo en puerto ${PORT}`);

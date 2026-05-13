@@ -9,14 +9,14 @@ const nodemailer = require('nodemailer');
 function getMailer() {
   if (!process.env.EMAIL_PASS) return null;
   return nodemailer.createTransport({
-    host: 'smtp.office365.com',
+    host: 'smtp-mail.outlook.com',
     port: 587,
     secure: false,
     auth: {
       user: 'lucero.vaca@hotmail.com',
       pass: process.env.EMAIL_PASS
     },
-    tls: { ciphers: 'SSLv3' }
+    tls: { rejectUnauthorized: false }
   });
 }
 
