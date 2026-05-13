@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GYNARE · Nueva Receta</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/platform.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar__brand"><div class="sidebar__brand-name">GYNARE</div><div class="sidebar__brand-sub">Clínica de la Mujer</div></div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">Principal</div>
+      <a href="/platform/dashboard.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>Dashboard</a>
+      <div class="sidebar__section">Pacientes</div>
+      <a href="/platform/pacientes.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Pacientes</a>
+    </nav>
+    <div class="sidebar__user"><div class="sidebar__user-avatar" id="sidebarAvatar">D</div><div><div class="sidebar__user-name" id="sidebarUserName">Cargando...</div><div class="sidebar__user-role" id="sidebarUserRole">Médico</div></div><button class="sidebar__logout" onclick="logout()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title" id="topbarTitle">Nueva Receta</span>
+      <div class="topbar__actions">
+        <a href="#" id="btnCancelar" class="btn btn--outline btn--sm">← Regresar</a>
+      </div>
+    </header>
+
+    <div class="content" style="display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start">
+
+      <!-- FORMULARIO -->
+      <div>
+        <div class="form-card">
+          <div class="form-card__header"><span class="form-card__title">💊 Datos de la Receta</span></div>
+          <div class="form-card__body">
+            <div class="form-grid form-grid--2">
+              <div class="form-group">
+                <label>Fecha</label>
+                <input type="date" id="f_fecha">
+              </div>
+              <div class="form-group">
+                <label>Diagnóstico</label>
+                <input type="text" id="f_diagnostico" placeholder="Diagnóstico principal">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-card" style="margin-top:16px">
+          <div class="form-card__header"><span class="form-card__title">➕ Agregar Medicamento</span></div>
+          <div class="form-card__body">
+            <div class="form-grid form-grid--2">
+              <div class="form-group form-group--full">
+                <label>Nombre del medicamento *</label>
+                <input type="text" id="med_nombre" placeholder="Ej. Metronidazol 500mg">
+              </div>
+              <div class="form-group">
+                <label>Dosis</label>
+                <input type="text" id="med_dosis" placeholder="500 mg cada 8 hrs">
+              </div>
+              <div class="form-group">
+                <label>Cantidad / Presentación</label>
+                <input type="text" id="med_cantidad" placeholder="12 tabletas">
+              </div>
+              <div class="form-group form-group--full">
+                <label>Instrucciones</label>
+                <textarea id="med_instrucciones" rows="2" placeholder="Tomar con alimentos por 7 días..."></textarea>
+              </div>
+            </div>
+            <button type="button" class="btn btn--secondary" onclick="agregarMed()">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5v10M1.5 6.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Agregar a la receta
+            </button>
+          </div>
+        </div>
+
+        <div class="form-card" style="margin-top:16px">
+          <div class="form-card__header"><span class="form-card__title">📝 Indicaciones Generales</span></div>
+          <div class="form-card__body">
+            <textarea id="f_indicaciones" rows="3" placeholder="Reposo, dieta, controles, alergias a considerar..." style="width:100%; padding:9px 12px; border:1.5px solid var(--gray-100); border-radius:8px; font-family:var(--font-sans); font-size:13.5px; outline:none; resize:vertical"></textarea>
+          </div>
+        </div>
+
+        <div style="margin-top:16px; display:flex; gap:10px; justify-content:flex-end">
+          <a href="#" id="btnCancel2" class="btn btn--outline">Cancelar</a>
+          <button type="button" class="btn btn--primary" id="btnGuardar" onclick="guardarReceta()">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l4 4 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Guardar Receta
+          </button>
+        </div>
+      </div>
+
+      <!-- PREVIEW -->
+      <div>
+        <div class="receta-preview" id="recetaPreview">
+          <div class="receta-preview__header">
+            <div class="receta-preview__name">GYNARE</div>
+            <div class="receta-preview__sub">Clínica de la Mujer · Dra. Lucero Vaca</div>
+          </div>
+          <div class="receta-preview__body">
+            <div id="pacienteInfo" style="font-size:13px; color:var(--gray-400); padding-bottom:10px; border-bottom:1px solid var(--gray-100); margin-bottom:12px">
+              Cargando paciente...
+            </div>
+            <div style="font-family:Georgia; font-size:28px; color:var(--plum); line-height:1; margin-bottom:8px">℞</div>
+            <div id="medListPreview">
+              <div style="font-size:13px; color:var(--gray-400); font-style:italic">Sin medicamentos agregados</div>
+            </div>
+            <div id="indicacionesPreview" style="display:none; margin-top:12px; padding:10px; background:var(--gray-50); border-radius:8px; font-size:12.5px; color:var(--gray-700)"></div>
+          </div>
+        </div>
+
+        <div id="printBtnWrap" style="display:none; margin-top:12px">
+          <a id="btnImprimir" href="#" target="_blank" class="btn btn--primary btn--full">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="2" y="1.5" width="10" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 5h5M4.5 7.5h5M4.5 10h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Imprimir / Descargar PDF
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="/js/platform-api.js"></script>
+<script>
+checkAuth(); renderUser();
+
+const params = new URLSearchParams(location.search);
+const pacienteId = params.get('paciente_id');
+const consultaId = params.get('consulta_id');
+
+if (!pacienteId) location.href = '/platform/pacientes.html';
+
+document.getElementById('btnCancelar').href = `/platform/paciente.html?id=${pacienteId}`;
+document.getElementById('btnCancel2').href = `/platform/paciente.html?id=${pacienteId}`;
+
+// Fecha hoy
+document.getElementById('f_fecha').value = new Date().toISOString().split('T')[0];
+
+let medicamentos = [];
+
+async function loadPacienteInfo() {
+  try {
+    const p = await API.get(`/pacientes/${pacienteId}`);
+    const nombre = `${p.nombre} ${p.apellido_paterno} ${p.apellido_materno || ''}`.trim();
+    const edad = p.edad || calcEdad(p.fecha_nacimiento);
+    document.getElementById('topbarTitle').textContent = `Nueva Receta — ${nombre}`;
+    document.getElementById('pacienteInfo').innerHTML = `
+      <strong>${nombre}</strong>
+      ${edad ? ` · ${edad} años` : ''}
+      ${p.fecha_nacimiento ? ` · Nac: ${formatDate(p.fecha_nacimiento)}` : ''}
+      ${p.alergias ? `<div style="color:#c62828; margin-top:4px; font-weight:600">⚠ Alergias: ${p.alergias}</div>` : ''}
+    `;
+  } catch { }
+}
+
+function agregarMed() {
+  const nombre = document.getElementById('med_nombre').value.trim();
+  if (!nombre) { toast('El nombre del medicamento es requerido', 'err'); return; }
+
+  const med = {
+    nombre,
+    dosis: document.getElementById('med_dosis').value.trim(),
+    cantidad: document.getElementById('med_cantidad').value.trim(),
+    instrucciones: document.getElementById('med_instrucciones').value.trim()
+  };
+
+  medicamentos.push(med);
+  document.getElementById('med_nombre').value = '';
+  document.getElementById('med_dosis').value = '';
+  document.getElementById('med_cantidad').value = '';
+  document.getElementById('med_instrucciones').value = '';
+  document.getElementById('med_nombre').focus();
+
+  renderPreview();
+}
+
+function quitarMed(i) {
+  medicamentos.splice(i, 1);
+  renderPreview();
+}
+
+function renderPreview() {
+  const div = document.getElementById('medListPreview');
+  if (!medicamentos.length) {
+    div.innerHTML = '<div style="font-size:13px; color:var(--gray-400); font-style:italic">Sin medicamentos agregados</div>';
+    return;
+  }
+  div.innerHTML = medicamentos.map((m, i) => `
+    <div class="med-item">
+      <div>
+        <div class="med-item__name">${i+1}. ${m.nombre}</div>
+        ${m.dosis ? `<div class="med-item__details">Dosis: ${m.dosis}</div>` : ''}
+        ${m.instrucciones ? `<div class="med-item__details">${m.instrucciones}</div>` : ''}
+        ${m.cantidad ? `<div class="med-item__details">Cantidad: ${m.cantidad}</div>` : ''}
+      </div>
+      <button class="med-item__remove" onclick="quitarMed(${i})" title="Quitar">✕</button>
+    </div>
+  `).join('');
+
+  const ind = document.getElementById('f_indicaciones').value.trim();
+  const indDiv = document.getElementById('indicacionesPreview');
+  if (ind) { indDiv.textContent = ind; indDiv.style.display = 'block'; } else { indDiv.style.display = 'none'; }
+}
+
+document.getElementById('f_indicaciones').addEventListener('input', renderPreview);
+
+async function guardarReceta() {
+  if (!medicamentos.length) { toast('Agrega al menos un medicamento', 'err'); return; }
+
+  const btn = document.getElementById('btnGuardar');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  try {
+    const result = await API.post('/recetas', {
+      paciente_id: pacienteId,
+      consulta_id: consultaId || null,
+      fecha: document.getElementById('f_fecha').value,
+      diagnostico: document.getElementById('f_diagnostico').value.trim() || null,
+      medicamentos: JSON.stringify(medicamentos),
+      indicaciones_generales: document.getElementById('f_indicaciones').value.trim() || null
+    });
+
+    toast('Receta guardada', 'ok');
+
+    // Mostrar botón de imprimir
+    document.getElementById('btnImprimir').href = `/api/recetas/${result.id}/pdf`;
+    document.getElementById('printBtnWrap').style.display = 'block';
+
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l4 4 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Guardar Receta';
+
+  } catch(err) {
+    toast(err.message || 'Error al guardar', 'err');
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l4 4 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Guardar Receta';
+  }
+}
+
+loadPacienteInfo();
+</script>
+</body>
+</html>

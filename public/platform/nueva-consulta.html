@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GYNARE · Nueva Consulta</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/platform.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar__brand"><div class="sidebar__brand-name">GYNARE</div><div class="sidebar__brand-sub">Clínica de la Mujer</div></div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">Principal</div>
+      <a href="/platform/dashboard.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>Dashboard</a>
+      <a href="/platform/citas.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 1.5v3M11 1.5v3M1.5 7h13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Agenda</a>
+      <a href="/platform/solicitudes.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3.5l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Solicitudes Web<span class="sidebar__badge" id="webBadge" style="display:none">0</span></a>
+      <div class="sidebar__section">Pacientes</div>
+      <a href="/platform/pacientes.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Pacientes</a>
+      <a href="/platform/nueva-paciente.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M1 14c0-3.31 2.69-6 6-6M11 10v4M9 12h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Nueva Paciente</a>
+    </nav>
+    <div class="sidebar__user"><div class="sidebar__user-avatar" id="sidebarAvatar">D</div><div><div class="sidebar__user-name" id="sidebarUserName">Cargando...</div><div class="sidebar__user-role" id="sidebarUserRole">Médico</div></div><button class="sidebar__logout" onclick="logout()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title" id="topbarTitle">Nueva Consulta</span>
+      <div class="topbar__actions">
+        <a href="#" id="btnCancelar" class="btn btn--outline btn--sm">← Regresar</a>
+      </div>
+    </header>
+
+    <div class="content">
+      <div id="patientBanner" style="background:var(--rose-pale); border:1px solid var(--rose-light); border-radius:var(--radius); padding:14px 18px; margin-bottom:16px; display:none">
+        <span id="bannerNombre" style="font-weight:500; font-size:14px"></span>
+        <span id="bannerMeta" style="font-size:13px; color:var(--gray-400); margin-left:10px"></span>
+      </div>
+
+      <form id="consultaForm">
+        <!-- Fecha y motivo -->
+        <div class="form-card">
+          <div class="form-card__header"><span class="form-card__title">📋 Datos de la Consulta</span></div>
+          <div class="form-card__body">
+            <div class="form-grid form-grid--2">
+              <div class="form-group">
+                <label>Fecha y hora *</label>
+                <input type="datetime-local" name="fecha" required id="fechaInput">
+              </div>
+              <div class="form-group">
+                <label>Motivo de consulta *</label>
+                <input type="text" name="motivo_consulta" required placeholder="Ej. Revisión general, Dolor pélvico...">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Signos vitales -->
+        <div class="form-card">
+          <div class="form-card__header"><span class="form-card__title">💓 Signos Vitales</span></div>
+          <div class="form-card__body">
+            <div class="form-grid form-grid--3">
+              <div class="form-group">
+                <label>Peso (kg)</label>
+                <input type="number" name="peso" step="0.1" min="20" max="300" placeholder="60.0" id="pesoInput">
+              </div>
+              <div class="form-group">
+                <label>Talla (cm)</label>
+                <input type="number" name="talla" step="0.5" min="100" max="220" placeholder="165" id="tallaInput">
+              </div>
+              <div class="form-group">
+                <label>IMC</label>
+                <input type="text" name="imc" id="imcInput" placeholder="Auto-calculado" readonly style="background:var(--gray-50)">
+              </div>
+              <div class="form-group">
+                <label>Tensión Arterial</label>
+                <input type="text" name="tension_arterial" placeholder="120/80 mmHg">
+              </div>
+              <div class="form-group">
+                <label>Frec. Cardíaca (lpm)</label>
+                <input type="number" name="frecuencia_cardiaca" min="30" max="200" placeholder="75">
+              </div>
+              <div class="form-group">
+                <label>Frec. Respiratoria</label>
+                <input type="number" name="frecuencia_respiratoria" min="8" max="50" placeholder="16">
+              </div>
+              <div class="form-group">
+                <label>Temperatura (°C)</label>
+                <input type="number" name="temperatura" step="0.1" min="34" max="42" placeholder="36.5">
+              </div>
+              <div class="form-group">
+                <label>SpO₂ (%)</label>
+                <input type="number" name="saturacion_oxigeno" min="70" max="100" placeholder="98">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SOAP -->
+        <div class="form-card">
+          <div class="form-card__header"><span class="form-card__title">📝 Nota Médica (SOAP)</span></div>
+          <div class="form-card__body">
+            <div class="form-grid">
+              <div class="form-group form-group--full">
+                <label>S — Subjetivo (motivo, síntomas referidos por la paciente)</label>
+                <textarea name="subjetivo" rows="4" placeholder="Paciente femenino de X años que refiere..."></textarea>
+              </div>
+              <div class="form-group form-group--full">
+                <label>O — Objetivo (exploración física)</label>
+                <textarea name="objetivo" rows="4" placeholder="A la exploración física: abdomen blando, depresible..."></textarea>
+              </div>
+              <div class="form-group form-group--full">
+                <label>Exploración Ginecológica</label>
+                <textarea name="exploracion_ginecologica" rows="3" placeholder="Genitales externos normales, especuloscopia..."></textarea>
+              </div>
+              <div class="form-group form-group--full">
+                <label>Resultado de Colposcopía (si aplica)</label>
+                <textarea name="colposcopia_resultado" rows="2" placeholder="Zona de transformación tipo... Impresión colposcópica..."></textarea>
+              </div>
+              <div class="form-group form-group--full">
+                <label>Resultado de Ultrasonido (si aplica)</label>
+                <textarea name="ultrasonido_resultado" rows="2" placeholder="Útero en AVF de X cm... Endometrio de X mm..."></textarea>
+              </div>
+              <div class="form-group form-group--full">
+                <label>Estudios de Laboratorio / Gabinete solicitados</label>
+                <textarea name="estudios_laboratorio" rows="2" placeholder="BHC, QS, Pap, Cultivo vaginal..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Diagnóstico y Plan -->
+        <div class="form-card">
+          <div class="form-card__header"><span class="form-card__title">🩺 Diagnóstico y Plan</span></div>
+          <div class="form-card__body">
+            <div class="form-grid">
+              <div class="form-group form-group--full">
+                <label>A — Diagnóstico Principal *</label>
+                <input type="text" name="diagnostico_principal" required placeholder="Ej. Vaginosis bacteriana / NIC I / SOP...">
+              </div>
+              <div class="form-group form-group--full">
+                <label>Diagnósticos secundarios</label>
+                <input type="text" name="diagnosticos_secundarios" placeholder="Diagnósticos adicionales separados por coma">
+              </div>
+              <div class="form-group form-group--full">
+                <label>P — Plan de tratamiento</label>
+                <textarea name="plan" rows="4" placeholder="Tratamiento farmacológico, procedimientos, referidos..."></textarea>
+              </div>
+              <div class="form-group form-group--full">
+                <label>Indicaciones a la paciente</label>
+                <textarea name="indicaciones" rows="3" placeholder="Reposo, dieta, higiene, cuidados en casa..."></textarea>
+              </div>
+              <div class="form-group">
+                <label>Fecha próxima cita</label>
+                <input type="date" name="proxima_cita_fecha">
+              </div>
+              <div class="form-group">
+                <label>Instrucciones próxima cita</label>
+                <input type="text" name="proxima_cita_instrucciones" placeholder="En 4 semanas con resultados...">
+              </div>
+              <div class="form-group form-group--full">
+                <label>Notas adicionales del médico</label>
+                <textarea name="notas" rows="2"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; padding-bottom:32px">
+          <a href="#" id="btnCancel2" class="btn btn--outline">Cancelar</a>
+          <button type="submit" class="btn btn--primary" id="submitBtn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l4 4 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Guardar Consulta
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="/js/platform-api.js"></script>
+<script>
+checkAuth(); renderUser(); loadWebBadge();
+
+const params = new URLSearchParams(location.search);
+const pacienteId = params.get('paciente_id');
+const citaId = params.get('cita_id');
+
+if (!pacienteId) location.href = '/platform/pacientes.html';
+
+// Fecha/hora actual por defecto
+const now = new Date();
+now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+document.getElementById('fechaInput').value = now.toISOString().slice(0, 16);
+
+// Links de cancelar
+document.getElementById('btnCancelar').href = `/platform/paciente.html?id=${pacienteId}`;
+document.getElementById('btnCancel2').href = `/platform/paciente.html?id=${pacienteId}`;
+
+// Cargar info del paciente
+async function loadPacienteInfo() {
+  try {
+    const p = await API.get(`/pacientes/${pacienteId}`);
+    const nombre = `${p.nombre} ${p.apellido_paterno} ${p.apellido_materno || ''}`.trim();
+    const edad = p.edad || calcEdad(p.fecha_nacimiento);
+    document.getElementById('topbarTitle').textContent = `Nueva Consulta — ${nombre}`;
+    const banner = document.getElementById('patientBanner');
+    banner.style.display = 'flex';
+    banner.style.alignItems = 'center';
+    document.getElementById('bannerNombre').textContent = nombre;
+    document.getElementById('bannerMeta').textContent = [
+      edad ? `${edad} años` : null,
+      p.alergias ? `⚠ Alergias: ${p.alergias}` : null
+    ].filter(Boolean).join(' · ');
+    if (p.alergias) document.getElementById('bannerMeta').style.color = '#c62828';
+  } catch { }
+}
+
+// Calcular IMC automáticamente
+['pesoInput', 'tallaInput'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    const peso = parseFloat(document.getElementById('pesoInput').value);
+    const talla = parseFloat(document.getElementById('tallaInput').value);
+    if (peso && talla) {
+      const imc = (peso / ((talla/100) ** 2)).toFixed(1);
+      document.getElementById('imcInput').value = imc;
+    }
+  });
+});
+
+// Submit
+document.getElementById('consultaForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  const data = { paciente_id: pacienteId };
+  if (citaId) data.cita_id = citaId;
+
+  new FormData(e.target).forEach((v, k) => {
+    if (v) data[k] = v;
+  });
+
+  try {
+    const result = await API.post('/consultas', data);
+    toast('Consulta guardada correctamente', 'ok');
+    setTimeout(() => window.location.href = `/platform/paciente.html?id=${pacienteId}`, 800);
+  } catch(err) {
+    toast(err.message || 'Error al guardar', 'err');
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7l4 4 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Guardar Consulta';
+  }
+});
+
+loadPacienteInfo();
+</script>
+</body>
+</html>

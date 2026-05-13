@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GYNARE · Expediente</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/platform.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar__brand"><div class="sidebar__brand-name">GYNARE</div><div class="sidebar__brand-sub">Clínica de la Mujer</div></div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">Principal</div>
+      <a href="/platform/dashboard.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>Dashboard</a>
+      <a href="/platform/citas.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 1.5v3M11 1.5v3M1.5 7h13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Agenda</a>
+      <a href="/platform/solicitudes.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3.5l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Solicitudes Web<span class="sidebar__badge" id="webBadge" style="display:none">0</span></a>
+      <div class="sidebar__section">Pacientes</div>
+      <a href="/platform/pacientes.html" class="sidebar__link active"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Pacientes</a>
+      <a href="/platform/nueva-paciente.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M1 14c0-3.31 2.69-6 6-6M11 10v4M9 12h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Nueva Paciente</a>
+    </nav>
+    <div class="sidebar__user"><div class="sidebar__user-avatar" id="sidebarAvatar">D</div><div><div class="sidebar__user-name" id="sidebarUserName">Cargando...</div><div class="sidebar__user-role" id="sidebarUserRole">Médico</div></div><button class="sidebar__logout" onclick="logout()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title" id="topbarTitle">Expediente</span>
+      <div class="topbar__actions" id="topbarActions"></div>
+    </header>
+
+    <div class="content">
+      <!-- Header paciente -->
+      <div class="patient-header" id="patientHeader">
+        <div class="patient-avatar" id="patientAvatar">?</div>
+        <div>
+          <div class="patient-name" id="patientName">Cargando...</div>
+          <div class="patient-meta" id="patientMeta"></div>
+        </div>
+        <div class="patient-header__actions" id="patientActions"></div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('resumen')">Resumen</button>
+        <button class="tab-btn" onclick="showTab('antecedentes')">Antecedentes</button>
+        <button class="tab-btn" onclick="showTab('ginecoobstetrico')">Gineco-Obstétrico</button>
+        <button class="tab-btn" onclick="showTab('consultas')">Consultas</button>
+        <button class="tab-btn" onclick="showTab('citas')">Citas</button>
+        <button class="tab-btn" onclick="showTab('recetas')">Recetas</button>
+      </div>
+
+      <!-- RESUMEN -->
+      <div class="tab-content active" id="tab-resumen">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px" id="resumenGrid">
+          <div class="empty-state"><p>Cargando...</p></div>
+        </div>
+      </div>
+
+      <!-- ANTECEDENTES -->
+      <div class="tab-content" id="tab-antecedentes">
+        <div class="form-card" id="antecedentesCard">
+          <div class="form-card__body"><div class="empty-state"><p>Cargando...</p></div></div>
+        </div>
+      </div>
+
+      <!-- GINECO-OBSTÉTRICO -->
+      <div class="tab-content" id="tab-ginecoobstetrico">
+        <div class="form-card" id="ginecoCard">
+          <div class="form-card__body"><div class="empty-state"><p>Cargando...</p></div></div>
+        </div>
+      </div>
+
+      <!-- CONSULTAS / EVOLUCIONES -->
+      <div class="tab-content" id="tab-consultas">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
+          <h3 style="font-size:15px; font-weight:500">Notas de evolución</h3>
+          <a id="btnNuevaConsulta" href="#" class="btn btn--primary btn--sm">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5v10M1.5 6.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Nueva Consulta
+          </a>
+        </div>
+        <div class="timeline" id="consultasTimeline">
+          <div class="empty-state"><p>Cargando...</p></div>
+        </div>
+      </div>
+
+      <!-- CITAS -->
+      <div class="tab-content" id="tab-citas">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
+          <h3 style="font-size:15px; font-weight:500">Historial de citas</h3>
+          <a id="btnNuevaCita" href="#" class="btn btn--secondary btn--sm">Nueva Cita</a>
+        </div>
+        <div class="citas-list" id="citasList">
+          <div class="empty-state"><p>Cargando...</p></div>
+        </div>
+      </div>
+
+      <!-- RECETAS -->
+      <div class="tab-content" id="tab-recetas">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px">
+          <h3 style="font-size:15px; font-weight:500">Recetas médicas</h3>
+          <a id="btnNuevaReceta" href="#" class="btn btn--secondary btn--sm">Nueva Receta</a>
+        </div>
+        <div id="recetasList">
+          <div class="empty-state"><p>Cargando...</p></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="/js/platform-api.js"></script>
+<script>
+checkAuth(); renderUser(); loadWebBadge();
+
+const params = new URLSearchParams(location.search);
+const pacienteId = params.get('id');
+if (!pacienteId) location.href = '/platform/pacientes.html';
+
+let paciente = null;
+
+async function loadPaciente() {
+  try {
+    paciente = await API.get(`/pacientes/${pacienteId}`);
+    const nombre = `${paciente.nombre} ${paciente.apellido_paterno} ${paciente.apellido_materno || ''}`.trim();
+    const edad = paciente.edad || calcEdad(paciente.fecha_nacimiento);
+
+    document.title = `GYNARE · ${nombre}`;
+    document.getElementById('topbarTitle').textContent = nombre;
+    document.getElementById('patientAvatar').textContent = paciente.nombre[0];
+    document.getElementById('patientName').textContent = nombre;
+    document.getElementById('patientMeta').textContent = [
+      edad ? `${edad} años` : null,
+      paciente.fecha_nacimiento ? formatDate(paciente.fecha_nacimiento) : null,
+      paciente.telefono,
+      paciente.tipo_sangre ? `GS: ${paciente.tipo_sangre}` : null
+    ].filter(Boolean).join(' · ');
+
+    document.getElementById('patientActions').innerHTML = `
+      <a href="/platform/nueva-consulta.html?paciente_id=${pacienteId}" class="btn btn--primary btn--sm">Nueva Consulta</a>
+      <a href="/platform/nueva-cita.html?paciente_id=${pacienteId}" class="btn btn--secondary btn--sm">Nueva Cita</a>
+      <a href="/platform/receta.html?paciente_id=${pacienteId}" class="btn btn--outline btn--sm">Nueva Receta</a>
+    `;
+    document.getElementById('btnNuevaConsulta').href = `/platform/nueva-consulta.html?paciente_id=${pacienteId}`;
+    document.getElementById('btnNuevaCita').href = `/platform/nueva-cita.html?paciente_id=${pacienteId}`;
+    document.getElementById('btnNuevaReceta').href = `/platform/receta.html?paciente_id=${pacienteId}`;
+
+    renderResumen(paciente);
+    renderAntecedentes(paciente);
+    renderGineco(paciente);
+    renderConsultas(paciente.consultas);
+    renderCitas(paciente.citas);
+    renderRecetas(paciente.recetas);
+
+  } catch(e) {
+    toast('Error cargando paciente', 'err');
+  }
+}
+
+function renderResumen(p) {
+  const edad = p.edad || calcEdad(p.fecha_nacimiento);
+  const grid = document.getElementById('resumenGrid');
+  grid.innerHTML = `
+    <div class="form-card">
+      <div class="form-card__header"><span class="form-card__title">📋 Datos Generales</span>
+        <a href="/platform/editar-paciente.html?id=${p.id}" class="btn btn--sm btn--outline">Editar</a>
+      </div>
+      <div class="form-card__body">
+        ${row('Nombre', `${p.nombre} ${p.apellido_paterno} ${p.apellido_materno||''}`)}
+        ${row('Edad', edad ? `${edad} años` : '—')}
+        ${row('Fecha nac.', formatDate(p.fecha_nacimiento))}
+        ${row('Estado civil', p.estado_civil || '—')}
+        ${row('Ocupación', p.ocupacion || '—')}
+        ${row('Teléfono', p.telefono || '—')}
+        ${row('Email', p.email || '—')}
+        ${row('Tipo de sangre', p.tipo_sangre || '—')}
+        ${p.alergias ? `<div style="margin-top:12px; padding:10px 12px; background:#ffebee; border-radius:8px; border:1px solid #ffcdd2"><strong style="font-size:12px; color:#c62828">⚠ ALERGIAS:</strong> <span style="font-size:13px; color:#c62828">${p.alergias}</span></div>` : ''}
+      </div>
+    </div>
+    <div class="form-card">
+      <div class="form-card__header"><span class="form-card__title">🌸 Gineco-Obstétrico</span></div>
+      <div class="form-card__body">
+        ${row('G.P.C.A.V', `${p.gestas||0} - ${p.partos||0} - ${p.cesareas||0} - ${p.abortos||0} - ${p.vivos||0}`)}
+        ${row('FUM', formatDate(p.fum))}
+        ${row('Menarca', p.menarca ? `${p.menarca} años` : '—')}
+        ${row('Ritmo', p.ritmo_menstrual || '—')}
+        ${row('MAC', p.metodo_anticonceptivo || '—')}
+        ${row('Último Pap', formatDate(p.ultimo_papanicolau))}
+        ${p.resultado_papanicolau ? row('Resultado Pap', `<span style="font-weight:500;color:${p.resultado_papanicolau==='Normal'?'#2e7d32':'#c62828'}">${p.resultado_papanicolau}</span>`) : ''}
+        ${row('Última Colposcopia', formatDate(p.ultima_colposcopia))}
+      </div>
+    </div>
+  `;
+}
+
+function row(label, value) {
+  return `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--gray-100); font-size:13.5px">
+    <span style="color:var(--gray-400)">${label}</span>
+    <span>${value || '—'}</span>
+  </div>`;
+}
+
+function renderAntecedentes(p) {
+  const card = document.getElementById('antecedentesCard');
+  card.innerHTML = `
+    <div class="form-card__header"><span class="form-card__title">📋 Antecedentes</span></div>
+    <div class="form-card__body">
+      ${seccion('Heredofamiliares', p.antecedentes_heredofamiliares)}
+      ${seccion('Personales Patológicos', p.antecedentes_personales_patologicos)}
+      ${seccion('Quirúrgicos', p.antecedentes_quirurgicos)}
+      ${seccion('Personales No Patológicos', p.antecedentes_personales_no_patologicos)}
+    </div>
+  `;
+}
+
+function seccion(titulo, contenido) {
+  return `<div style="margin-bottom:16px">
+    <div style="font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--gray-400); margin-bottom:6px">${titulo}</div>
+    <div style="font-size:13.5px; color:var(--gray-700); line-height:1.7; background:var(--gray-50); padding:10px 14px; border-radius:8px">${contenido || 'Sin información registrada'}</div>
+  </div>`;
+}
+
+function renderGineco(p) {
+  const card = document.getElementById('ginecoCard');
+  card.innerHTML = `
+    <div class="form-card__header"><span class="form-card__title">🌸 Historia Gineco-Obstétrica</span></div>
+    <div class="form-card__body">
+      <div class="form-grid form-grid--3" style="gap:8px">
+        ${gField('Menarca', p.menarca ? `${p.menarca} años` : '—')}
+        ${gField('Ritmo menstrual', p.ritmo_menstrual || '—')}
+        ${gField('Dismenorrea', p.dismenorrea ? 'Sí' : 'No')}
+        ${gField('FUM', formatDate(p.fum))}
+        ${gField('IVSA', p.inicio_vida_sexual ? `${p.inicio_vida_sexual} años` : '—')}
+        ${gField('Núm. parejas', p.num_parejas_sexuales || '—')}
+        ${gField('Gestas', p.gestas || 0)}
+        ${gField('Partos', p.partos || 0)}
+        ${gField('Cesáreas', p.cesareas || 0)}
+        ${gField('Abortos', p.abortos || 0)}
+        ${gField('Vivos', p.vivos || 0)}
+        ${gField('MAC', p.metodo_anticonceptivo || '—')}
+        ${gField('Último Pap', formatDate(p.ultimo_papanicolau))}
+        ${gField('Resultado Pap', p.resultado_papanicolau || '—')}
+        ${gField('Última Colpo', formatDate(p.ultima_colposcopia))}
+        ${gField('Resultado Colpo', p.resultado_colposcopia || '—')}
+        ${gField('Vacuna VPH', p.vacuna_vph ? 'Sí' : 'No')}
+      </div>
+      ${p.notas_adicionales ? `<div style="margin-top:14px">${seccion('Notas adicionales', p.notas_adicionales)}</div>` : ''}
+    </div>
+  `;
+}
+
+function gField(label, value) {
+  return `<div style="background:var(--gray-50); border-radius:8px; padding:10px 12px; border:1px solid var(--gray-100)">
+    <div style="font-size:10px; color:var(--gray-400); text-transform:uppercase; letter-spacing:.08em; margin-bottom:3px">${label}</div>
+    <div style="font-size:14px; font-weight:500; color:var(--text)">${value}</div>
+  </div>`;
+}
+
+function renderConsultas(consultas) {
+  const div = document.getElementById('consultasTimeline');
+  if (!consultas || !consultas.length) {
+    div.innerHTML = '<div class="empty-state"><p>Sin consultas registradas aún</p></div>';
+    return;
+  }
+  div.innerHTML = consultas.map(c => `
+    <div class="timeline-item">
+      <div class="timeline-dot">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M8 3v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="timeline-body">
+        <div class="timeline-date">${formatDateTime(c.fecha)}</div>
+        <div class="timeline-card">
+          <div class="timeline-card__title">${c.motivo_consulta || 'Consulta médica'}</div>
+          ${c.diagnostico_principal ? `<div class="timeline-card__diag">Dx: ${c.diagnostico_principal}</div>` : ''}
+          ${c.plan ? `<div class="timeline-card__text"><strong>Plan:</strong> ${c.plan}</div>` : ''}
+          <div class="timeline-card__actions">
+            <a href="/platform/consulta.html?id=${c.id}" class="btn btn--sm btn--outline">Ver detalle</a>
+            <a href="/platform/receta.html?paciente_id=${pacienteId}&consulta_id=${c.id}" class="btn btn--sm btn--secondary">Receta</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderCitas(citas) {
+  const div = document.getElementById('citasList');
+  if (!citas || !citas.length) {
+    div.innerHTML = '<div class="empty-state"><p>Sin citas registradas</p></div>';
+    return;
+  }
+  div.innerHTML = citas.map(c => `
+    <div class="cita-row">
+      <div class="cita-row__time">
+        <div class="cita-row__time-hora">${formatHora(c.hora)}</div>
+        <div class="cita-row__time-fecha">${formatDate(c.fecha)}</div>
+      </div>
+      <div class="cita-row__info">
+        <div class="cita-row__name">${tipoLabel(c.tipo)}</div>
+        <div class="cita-row__meta">${c.motivo || 'Sin motivo especificado'}</div>
+      </div>
+      <span class="badge badge--${c.estado}">${estadoLabel(c.estado)}</span>
+    </div>
+  `).join('');
+}
+
+function renderRecetas(recetas) {
+  const div = document.getElementById('recetasList');
+  if (!recetas || !recetas.length) {
+    div.innerHTML = '<div class="empty-state"><p>Sin recetas registradas</p></div>';
+    return;
+  }
+  div.innerHTML = recetas.map(r => `
+    <div class="form-card" style="margin-bottom:10px">
+      <div class="form-card__header">
+        <span class="form-card__title">💊 Receta del ${formatDate(r.fecha)}</span>
+        <div style="display:flex; gap:6px">
+          <a href="/api/recetas/${r.id}/pdf" target="_blank" class="btn btn--sm btn--primary">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="2" y="1.5" width="9" height="10" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 5h4M4.5 7h4M4.5 9h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Imprimir PDF
+          </a>
+        </div>
+      </div>
+      <div class="form-card__body" style="padding:14px 20px">
+        ${r.diagnostico ? `<div style="font-size:12px; color:var(--gray-400); margin-bottom:8px">Dx: ${r.diagnostico}</div>` : ''}
+        <div style="font-size:13px; color:var(--gray-700)">${r.medicamentos}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function tipoLabel(t) {
+  const tipos = { primera_vez: 'Primera vez', seguimiento: 'Seguimiento', urgencia: 'Urgencia', colposcopia: 'Colposcopía', ultrasonido: 'Ultrasonido' };
+  return tipos[t] || t || '—';
+}
+function estadoLabel(e) {
+  const estados = { pendiente: 'Pendiente', confirmada: 'Confirmada', completada: 'Completada', cancelada: 'Cancelada' };
+  return estados[e] || e;
+}
+
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  event.target.classList.add('active');
+}
+
+loadPaciente();
+</script>
+</body>
+</html>

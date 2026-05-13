@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GYNARE · Solicitudes Web</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/platform.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar__brand"><div class="sidebar__brand-name">GYNARE</div><div class="sidebar__brand-sub">Clínica de la Mujer</div></div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">Principal</div>
+      <a href="/platform/dashboard.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>Dashboard</a>
+      <a href="/platform/citas.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 1.5v3M11 1.5v3M1.5 7h13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Agenda</a>
+      <a href="/platform/solicitudes.html" class="sidebar__link active"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3.5l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Solicitudes Web<span class="sidebar__badge" id="webBadge" style="display:none">0</span></a>
+      <div class="sidebar__section">Pacientes</div>
+      <a href="/platform/pacientes.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Pacientes</a>
+      <a href="/platform/nueva-paciente.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M1 14c0-3.31 2.69-6 6-6M11 10v4M9 12h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Nueva Paciente</a>
+    </nav>
+    <div class="sidebar__user"><div class="sidebar__user-avatar" id="sidebarAvatar">D</div><div><div class="sidebar__user-name" id="sidebarUserName">Cargando...</div><div class="sidebar__user-role" id="sidebarUserRole">Médico</div></div><button class="sidebar__logout" onclick="logout()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title">Solicitudes de Cita desde el Sitio Web</span>
+    </header>
+
+    <div class="content">
+      <div style="background:#fff8e1; border:1px solid #ffe082; border-radius:var(--radius); padding:14px 18px; margin-bottom:20px; font-size:13.5px; color:#5d4037">
+        💡 Estas solicitudes llegan desde el formulario de tu sitio web. Confírmalas comunicándote con la paciente y convirtiéndolas en cita oficial.
+      </div>
+
+      <div id="solicitudesContainer">
+        <div class="empty-state"><p>Cargando...</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para confirmar solicitud -->
+<div id="modalOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center">
+  <div style="background:var(--white); border-radius:var(--radius-lg); padding:28px; max-width:480px; width:calc(100% - 40px); box-shadow:var(--shadow-lg)">
+    <h3 style="font-size:16px; font-weight:500; margin-bottom:4px">Confirmar Solicitud</h3>
+    <p style="font-size:13px; color:var(--gray-400); margin-bottom:20px">Registra al paciente y confirma la cita</p>
+    <div id="modalContent"></div>
+    <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:16px">
+      <button onclick="cerrarModal()" class="btn btn--outline btn--sm">Cancelar</button>
+      <button onclick="cancelarSolicitud()" class="btn btn--danger btn--sm">Rechazar solicitud</button>
+      <a id="btnRegistrarPaciente" href="#" class="btn btn--primary btn--sm">Registrar paciente</a>
+    </div>
+  </div>
+</div>
+
+<script src="/js/platform-api.js"></script>
+<script>
+checkAuth(); renderUser(); loadWebBadge();
+
+let solicitudActiva = null;
+
+async function loadSolicitudes() {
+  try {
+    const data = await API.get('/citas/solicitudes-web');
+    const div = document.getElementById('solicitudesContainer');
+
+    if (!data.length) {
+      div.innerHTML = '<div class="empty-state"><svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="#9E8898" stroke-width="1.5"/><path d="M24 16v8l4 4" stroke="#9E8898" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><p>No hay solicitudes pendientes</p></div>';
+      return;
+    }
+
+    div.innerHTML = `
+      <div style="font-size:13px; color:var(--gray-400); margin-bottom:14px">${data.length} solicitud${data.length !== 1 ? 'es' : ''} pendiente${data.length !== 1 ? 's' : ''}</div>
+      ${data.map(s => `
+        <div class="solicitud-card">
+          <div class="solicitud-card__header">
+            <div>
+              <div class="solicitud-card__name">${s.web_nombre}</div>
+              <div class="solicitud-card__fecha">Recibida: ${formatDateTime(s.created_at)}</div>
+            </div>
+            <span class="badge badge--pendiente">Pendiente</span>
+          </div>
+          <div class="solicitud-card__info">
+            <span>📞 <strong>${s.web_telefono}</strong></span>
+            ${s.web_email ? `<span>📧 ${s.web_email}</span>` : ''}
+            <span>📅 ${formatDate(s.fecha)} a las <strong>${formatHora(s.hora)}</strong></span>
+            <span>${s.web_es_primera_vez ? '🆕 Primera vez' : '🔄 Seguimiento'}</span>
+          </div>
+          ${s.web_motivo ? `<div class="solicitud-card__motivo">"${s.web_motivo}"</div>` : ''}
+          <div class="solicitud-card__actions">
+            <button onclick="abrirModal(${JSON.stringify(s).replace(/"/g,'&quot;')})" class="btn btn--primary btn--sm">Confirmar cita</button>
+            <button onclick="cancelarDirecto(${s.id})" class="btn btn--danger btn--sm">Rechazar</button>
+          </div>
+        </div>
+      `).join('')}
+    `;
+  } catch(e) {
+    document.getElementById('solicitudesContainer').innerHTML = '<div class="empty-state"><p>Error cargando solicitudes</p></div>';
+  }
+}
+
+function abrirModal(solicitud) {
+  solicitudActiva = solicitud;
+  document.getElementById('modalContent').innerHTML = `
+    <div style="background:var(--gray-50); border-radius:8px; padding:14px; margin-bottom:12px; font-size:13.5px">
+      <div><strong>${solicitud.web_nombre}</strong></div>
+      <div style="color:var(--gray-400); margin-top:4px">${solicitud.web_telefono} · ${formatDate(solicitud.fecha)} ${formatHora(solicitud.hora)}</div>
+    </div>
+    <p style="font-size:13px; color:var(--gray-700)">Para confirmar la cita, registra primero a la paciente en el sistema. Después podrás vincular la cita.</p>
+  `;
+  const p = solicitud;
+  const query = encodeURIComponent(JSON.stringify({
+    nombre: p.web_nombre.split(' ')[0],
+    apellido_paterno: p.web_nombre.split(' ').slice(1).join(' '),
+    telefono: p.web_telefono,
+    email: p.web_email || '',
+    cita_ref: p.id
+  }));
+  document.getElementById('btnRegistrarPaciente').href = `/platform/nueva-paciente.html`;
+
+  document.getElementById('modalOverlay').style.display = 'flex';
+}
+
+function cerrarModal() {
+  document.getElementById('modalOverlay').style.display = 'none';
+  solicitudActiva = null;
+}
+
+async function cancelarSolicitud() {
+  if (!solicitudActiva) return;
+  if (!confirm('¿Rechazar esta solicitud?')) return;
+  await cancelarDirecto(solicitudActiva.id);
+  cerrarModal();
+}
+
+async function cancelarDirecto(id) {
+  try {
+    if (!confirm('¿Rechazar esta solicitud de cita?')) return;
+    await API.post(`/citas/${id}/cancelar`, {});
+    toast('Solicitud rechazada', 'ok');
+    loadSolicitudes();
+    loadWebBadge();
+  } catch(e) {
+    toast(e.message, 'err');
+  }
+}
+
+loadSolicitudes();
+</script>
+</body>
+</html>

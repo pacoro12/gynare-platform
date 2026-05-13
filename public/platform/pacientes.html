@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GYNARE · Pacientes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/platform.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__brand"><div class="sidebar__brand-name">GYNARE</div><div class="sidebar__brand-sub">Clínica de la Mujer</div></div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">Principal</div>
+      <a href="/platform/dashboard.html" class="sidebar__link">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>
+        Dashboard
+      </a>
+      <a href="/platform/citas.html" class="sidebar__link">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 1.5v3M11 1.5v3M1.5 7h13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Agenda
+      </a>
+      <a href="/platform/solicitudes.html" class="sidebar__link">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3.5l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Solicitudes Web
+        <span class="sidebar__badge" id="webBadge" style="display:none">0</span>
+      </a>
+      <div class="sidebar__section">Pacientes</div>
+      <a href="/platform/pacientes.html" class="sidebar__link active">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Pacientes
+      </a>
+      <a href="/platform/nueva-paciente.html" class="sidebar__link">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M1 14c0-3.31 2.69-6 6-6M11 10v4M9 12h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Nueva Paciente
+      </a>
+    </nav>
+    <div class="sidebar__user">
+      <div class="sidebar__user-avatar" id="sidebarAvatar">D</div>
+      <div><div class="sidebar__user-name" id="sidebarUserName">Cargando...</div><div class="sidebar__user-role" id="sidebarUserRole">Médico</div></div>
+      <button class="sidebar__logout" onclick="logout()">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title">Pacientes</span>
+      <div class="topbar__actions">
+        <a href="/platform/nueva-paciente.html" class="btn btn--primary btn--sm">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5v10M1.5 6.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Nueva Paciente
+        </a>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="table-wrap">
+        <div class="table-head">
+          <span class="table-head__title" id="tableTitle">Todas las pacientes</span>
+          <div class="table-head__tools">
+            <input type="search" class="search-input" id="searchInput" placeholder="Buscar paciente..." style="width:240px">
+          </div>
+        </div>
+        <div id="tableBody">
+          <div class="empty-state"><p>Cargando...</p></div>
+        </div>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/platform-api.js"></script>
+<script>
+checkAuth(); renderUser(); loadWebBadge();
+
+let currentPage = 1;
+let searchTimer;
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    currentPage = 1;
+    loadPacientes(e.target.value);
+  }, 300);
+});
+
+async function loadPacientes(q = '', page = 1) {
+  const url = `/pacientes?page=${page}&limit=20${q ? '&q=' + encodeURIComponent(q) : ''}`;
+  try {
+    const data = await API.get(url);
+    document.getElementById('tableTitle').textContent = `${data.total} paciente${data.total !== 1 ? 's' : ''}`;
+    renderTable(data.pacientes);
+    renderPagination(data);
+  } catch(e) {
+    document.getElementById('tableBody').innerHTML = '<div class="empty-state"><p>Error cargando pacientes</p></div>';
+  }
+}
+
+function renderTable(pacientes) {
+  const div = document.getElementById('tableBody');
+  if (!pacientes.length) {
+    div.innerHTML = '<div class="empty-state"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="14" r="7" stroke="#9E8898" stroke-width="1.5"/><path d="M5 36c0-8.28 6.72-15 15-15s15 6.72 15 15" stroke="#9E8898" stroke-width="1.5"/></svg><p>No se encontraron pacientes</p></div>';
+    return;
+  }
+  div.innerHTML = `
+    <table>
+      <thead>
+        <tr>
+          <th>Paciente</th>
+          <th>Teléfono</th>
+          <th>Edad</th>
+          <th>Registro</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${pacientes.map(p => `
+          <tr>
+            <td>
+              <div class="td-name">${p.nombre} ${p.apellido_paterno} ${p.apellido_materno || ''}</div>
+              <div class="td-sub">${p.email || 'Sin email'}</div>
+            </td>
+            <td>${p.telefono || '—'}</td>
+            <td>${p.edad || (p.fecha_nacimiento ? calcEdad(p.fecha_nacimiento) + ' años' : '—')}</td>
+            <td>${formatDate(p.created_at)}</td>
+            <td>
+              <div class="td-actions">
+                <a href="/platform/paciente.html?id=${p.id}" class="btn btn--sm btn--outline">Ver expediente</a>
+                <a href="/platform/nueva-cita.html?paciente_id=${p.id}" class="btn btn--sm btn--secondary">Nueva cita</a>
+              </div>
+            </td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderPagination(data) {
+  const div = document.getElementById('pagination');
+  if (data.pages <= 1) { div.innerHTML = ''; return; }
+  div.innerHTML = `
+    <span class="page-info">${data.total} pacientes</span>
+    ${Array.from({length: data.pages}, (_, i) => i + 1).map(p =>
+      `<button class="page-btn ${p === data.page ? 'active' : ''}" onclick="loadPacientes('${document.getElementById('searchInput').value}', ${p})">${p}</button>`
+    ).join('')}
+  `;
+}
+
+loadPacientes();
+</script>
+</body>
+</html>

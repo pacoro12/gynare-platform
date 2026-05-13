@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GYNARE · Agenda</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/platform.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar__brand"><div class="sidebar__brand-name">GYNARE</div><div class="sidebar__brand-sub">Clínica de la Mujer</div></div>
+    <nav class="sidebar__nav">
+      <div class="sidebar__section">Principal</div>
+      <a href="/platform/dashboard.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.3"/></svg>Dashboard</a>
+      <a href="/platform/citas.html" class="sidebar__link active"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="2" stroke="currentColor" stroke-width="1.3"/><path d="M5 1.5v3M11 1.5v3M1.5 7h13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Agenda</a>
+      <a href="/platform/solicitudes.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3.5l2 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>Solicitudes Web<span class="sidebar__badge" id="webBadge" style="display:none">0</span></a>
+      <div class="sidebar__section">Pacientes</div>
+      <a href="/platform/pacientes.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M2 14c0-3.31 2.69-6 6-6s6 2.69 6 6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Pacientes</a>
+      <a href="/platform/nueva-paciente.html" class="sidebar__link"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="7" cy="5.5" r="3" stroke="currentColor" stroke-width="1.3"/><path d="M1 14c0-3.31 2.69-6 6-6M11 10v4M9 12h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>Nueva Paciente</a>
+    </nav>
+    <div class="sidebar__user"><div class="sidebar__user-avatar" id="sidebarAvatar">D</div><div><div class="sidebar__user-name" id="sidebarUserName">Cargando...</div><div class="sidebar__user-role" id="sidebarUserRole">Médico</div></div><button class="sidebar__logout" onclick="logout()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M10 11l3-3-3-3M13 8H6" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title">Agenda</span>
+      <div class="topbar__actions">
+        <a href="/platform/nueva-cita.html" class="btn btn--primary btn--sm">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1.5v10M1.5 6.5h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Nueva Cita
+        </a>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- Selector de fecha -->
+      <div style="background:var(--white); border:1px solid var(--gray-100); border-radius:var(--radius); padding:16px 20px; margin-bottom:16px; display:flex; align-items:center; gap:16px; flex-wrap:wrap">
+        <div style="display:flex; align-items:center; gap:8px">
+          <button onclick="cambiarDia(-1)" class="btn btn--outline btn--sm btn--icon">◀</button>
+          <input type="date" id="fechaSelector" style="padding:8px 14px; border:1.5px solid var(--gray-100); border-radius:8px; font-size:13px; font-family:var(--font-sans); outline:none; cursor:pointer">
+          <button onclick="cambiarDia(1)" class="btn btn--outline btn--sm btn--icon">▶</button>
+          <button onclick="irHoy()" class="btn btn--secondary btn--sm">Hoy</button>
+        </div>
+        <div id="diaLabel" style="font-size:15px; font-weight:500; color:var(--text)"></div>
+        <div style="margin-left:auto; display:flex; gap:8px; align-items:center">
+          <span style="font-size:12px; color:var(--gray-400)">Estado:</span>
+          <select id="estadoFilter" onchange="loadCitas()" style="padding:6px 12px; border:1.5px solid var(--gray-100); border-radius:8px; font-size:13px; font-family:var(--font-sans); outline:none">
+            <option value="">Todos</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="confirmada">Confirmada</option>
+            <option value="completada">Completada</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Lista citas -->
+      <div class="table-wrap">
+        <div class="table-head">
+          <span class="table-head__title" id="citasTitle">Citas</span>
+        </div>
+        <div id="citasList" style="padding:8px 0">
+          <div class="empty-state"><p>Cargando...</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/platform-api.js"></script>
+<script>
+checkAuth(); renderUser(); loadWebBadge();
+
+const fechaSel = document.getElementById('fechaSelector');
+// Ir a hoy por defecto
+const hoy = new Date().toISOString().split('T')[0];
+fechaSel.value = hoy;
+actualizarLabel();
+
+fechaSel.addEventListener('change', () => { actualizarLabel(); loadCitas(); });
+
+function cambiarDia(delta) {
+  const fecha = new Date(fechaSel.value + 'T12:00:00');
+  fecha.setDate(fecha.getDate() + delta);
+  fechaSel.value = fecha.toISOString().split('T')[0];
+  actualizarLabel();
+  loadCitas();
+}
+
+function irHoy() {
+  fechaSel.value = new Date().toISOString().split('T')[0];
+  actualizarLabel();
+  loadCitas();
+}
+
+function actualizarLabel() {
+  const fecha = new Date(fechaSel.value + 'T12:00:00');
+  const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  document.getElementById('diaLabel').textContent = `${dias[fecha.getDay()]} ${fecha.getDate()} de ${meses[fecha.getMonth()]} ${fecha.getFullYear()}`;
+}
+
+async function loadCitas() {
+  const fecha = fechaSel.value;
+  const estado = document.getElementById('estadoFilter').value;
+  let url = `/citas?fecha=${fecha}`;
+  if (estado) url += `&estado=${estado}`;
+
+  try {
+    const citas = await API.get(url);
+    const title = document.getElementById('citasTitle');
+    title.textContent = `${citas.length} cita${citas.length !== 1 ? 's' : ''}`;
+
+    const div = document.getElementById('citasList');
+    if (!citas.length) {
+      div.innerHTML = '<div class="empty-state"><svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="4" y="8" width="32" height="28" rx="4" stroke="#9E8898" stroke-width="1.5"/><path d="M13 4v8M27 4v8M4 18h32" stroke="#9E8898" stroke-width="1.5" stroke-linecap="round"/></svg><p>No hay citas para este día</p></div>';
+      return;
+    }
+
+    div.innerHTML = citas.map(c => {
+      const nombre = c.nombre ? `${c.nombre} ${c.apellido_paterno}` : c.web_nombre || 'Sin nombre';
+      return `
+        <div class="cita-row" style="margin:6px 12px; cursor:default">
+          <div class="cita-row__time">
+            <div class="cita-row__time-hora">${formatHora(c.hora)}</div>
+          </div>
+          <div class="cita-row__info">
+            <div class="cita-row__name">${nombre}</div>
+            <div class="cita-row__meta">${tipoLabel(c.tipo)} · ${c.motivo || c.web_motivo || 'Sin motivo'} · ${c.p_telefono || c.web_telefono || ''}</div>
+          </div>
+          <div class="cita-row__actions">
+            <span class="badge badge--${c.estado}">${estadoLabel(c.estado)}</span>
+            ${c.estado !== 'cancelada' && c.estado !== 'completada' ? `
+              <button onclick="cambiarEstado(${c.id}, 'confirmada')" class="btn btn--sm btn--secondary" ${c.estado === 'confirmada' ? 'disabled' : ''}>Confirmar</button>
+              <button onclick="cambiarEstado(${c.id}, 'cancelada')" class="btn btn--sm btn--danger">Cancelar</button>
+            ` : ''}
+            ${c.paciente_id ? `<a href="/platform/nueva-consulta.html?paciente_id=${c.paciente_id}&cita_id=${c.id}" class="btn btn--sm btn--primary">Consulta</a>` : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+  } catch(e) {
+    document.getElementById('citasList').innerHTML = '<div class="empty-state"><p>Error cargando citas</p></div>';
+  }
+}
+
+async function cambiarEstado(id, estado) {
+  try {
+    if (estado === 'cancelada' && !confirm('¿Cancelar esta cita?')) return;
+    const endpoint = estado === 'cancelada' ? `/citas/${id}/cancelar` : `/citas/${id}/confirmar`;
+    await API.post(endpoint, {});
+    toast(estado === 'cancelada' ? 'Cita cancelada' : 'Cita confirmada', 'ok');
+    loadCitas();
+  } catch(e) {
+    toast(e.message, 'err');
+  }
+}
+
+function tipoLabel(t) {
+  const tipos = { primera_vez: 'Primera vez', seguimiento: 'Seguimiento', urgencia: 'Urgencia', colposcopia: 'Colposcopía', ultrasonido: 'Ultrasonido' };
+  return tipos[t] || t || '—';
+}
+function estadoLabel(e) {
+  const estados = { pendiente: 'Pendiente', confirmada: 'Confirmada', completada: 'Completada', cancelada: 'Cancelada' };
+  return estados[e] || e;
+}
+
+loadCitas();
+</script>
+</body>
+</html>
