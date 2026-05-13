@@ -167,6 +167,27 @@ a { text-decoration: none; color: inherit; }
   letter-spacing: 0.12em; color: var(--white); line-height: 1;
 }
 .hero__sub { font-size: 12px; font-weight: 300; letter-spacing: 0.3em; text-transform: uppercase; color: var(--rose); }
+.hero__insignia {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: rgba(196,160,184,0.12); border: 1px solid rgba(196,160,184,0.35);
+  border-radius: 50px; padding: 9px 22px; margin-bottom: 28px;
+}
+.hero__insignia-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--rose); flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(196,160,184,0.8);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+.hero__insignia-tag {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--rose); white-space: nowrap;
+}
+.hero__insignia-sep { color: rgba(196,160,184,0.4); font-size: 12px; }
+.hero__insignia-name {
+  font-size: 12px; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(255,255,255,0.9);
+}
 .hero__text {
   color: rgba(255,255,255,0.75); font-size: 17px; font-weight: 300; line-height: 1.85; margin-bottom: 40px;
 }
@@ -222,6 +243,18 @@ a { text-decoration: none; color: inherit; }
   padding: 5px 10px; line-height: 1; flex-shrink: 0; min-width: 56px; text-align: center;
 }
 .about__stat-badge--alt { background: var(--plum-mid); }
+.about__stat-badge--rose {
+  background: linear-gradient(135deg, var(--plum) 0%, var(--plum-mid) 100%);
+  letter-spacing: 0.06em;
+}
+.about__stat--insignia {
+  border-color: rgba(196,160,184,0.5);
+  background: linear-gradient(135deg, var(--rose-pale) 0%, #f5edf3 100%);
+  box-shadow: 0 2px 12px rgba(75,16,64,0.08);
+}
+.about__stat--insignia .about__stat-label strong {
+  display: block; color: var(--plum); font-size: 14.5px; font-weight: 600; margin-bottom: 2px;
+}
 .about__stat-label { font-size: 13.5px; color: var(--gray-700); line-height: 1.45; }
 .about__desc { font-size: 16px; line-height: 1.9; color: var(--gray-700); margin-bottom: 16px; }
 .about__tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 28px 0; }
